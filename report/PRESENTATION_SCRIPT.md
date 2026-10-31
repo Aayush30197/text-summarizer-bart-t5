@@ -63,10 +63,13 @@
 * **Visual:** Final ROUGE-1/2/L table, training loss curves, and latency per article comparison.
 * **Spoken Script:**
   > *"Looking at our fine-tuned results on the 1,000-article test set:*  
-  > *[Present ROUGE numbers and loss convergence trends].*  
-  > *In terms of computational efficiency:*  
-  > *- BART-base achieved lower per-article generation latency, primarily due to its shallower 6-layer decoder and BPE tokenization efficiency.*  
-  > *- T5-base had higher memory usage and inference latency due to its 12-layer decoder depth, representing a trade-off between model capacity and deployment efficiency."*
+  > *- Both models saw an impressive +12.4% leap in ROUGE-1 over their baselines.*  
+  > *- T5-base achieved 42.88% ROUGE-1, 20.24% ROUGE-2, and 30.12% ROUGE-L.*  
+  > *- BART-base achieved 40.23% ROUGE-1, 17.71% ROUGE-2, and 27.06% ROUGE-L, while achieving a higher ROUGE-Lsum of 37.01%.*  
+  > *However, when we look at computational efficiency, BART-base was the clear winner:*  
+  > *- BART generated summaries in just 0.309 seconds per article—nearly twice as fast as T5 at 0.569 seconds.*  
+  > *- BART completed full training in just 11.5 minutes compared to 22 minutes for T5.*  
+  > *- BART produced concise 83-token summaries, whereas T5 produced longer 100-token summaries."*
 
 ---
 
