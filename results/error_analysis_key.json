@@ -1,0 +1,127 @@
+[
+  {
+    "article_id": 0,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 1,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 2,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 3,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 4,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 5,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 6,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 7,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 8,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 9,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 10,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 11,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 12,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 13,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 14,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 15,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 16,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 17,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 18,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 19,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 20,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 21,
+    "summary_a_model": "BART",
+    "summary_b_model": "T5"
+  },
+  {
+    "article_id": 22,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 23,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  },
+  {
+    "article_id": 24,
+    "summary_a_model": "T5",
+    "summary_b_model": "BART"
+  }
+]

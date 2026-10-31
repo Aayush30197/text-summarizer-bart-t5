@@ -108,34 +108,48 @@ def generate_blinded_sheet(args):
     references = sample_data["highlights"]
     print(f"[error_analysis] Sampled {len(articles)} articles for error analysis")
 
-    # Load and generate with BART
-    bart_checkpoint = args.bart_checkpoint or bart_cfg["output_dir"]
-    print(f"[error_analysis] Loading BART from {bart_checkpoint}")
-    bart_tokenizer = AutoTokenizer.from_pretrained(bart_checkpoint)
-    bart_model = AutoModelForSeq2SeqLM.from_pretrained(bart_checkpoint).to(device)
-    if bart_cfg.get("fp16", False) and not on_mps:
-        bart_model.half()
+    # Check if precomputed evaluation outputs exist (e.g. from Kaggle run)
+    bart_eval_path = results_dir / "eval_bart_full_outputs.json"
+    t5_eval_path = results_dir / "eval_t5_full_outputs.json"
 
-    print("[error_analysis] Generating BART summaries...")
-    bart_summaries = generate_summaries_simple(
-        bart_model, bart_tokenizer, articles, decoding_cfg,
-        bart_cfg.get("source_prefix", ""), cfg["max_source_length"], device,
-    )
-    del bart_model, bart_tokenizer
-    torch.cuda.empty_cache() if device.type == "cuda" else None
+    if bart_eval_path.exists() and t5_eval_path.exists():
+        print(f"[error_analysis] Found precomputed outputs in {results_dir}! Using exact test predictions.")
+        with open(bart_eval_path) as f:
+            bart_all = json.load(f)
+        with open(t5_eval_path) as f:
+            t5_all = json.load(f)
 
-    # Load and generate with T5
-    t5_checkpoint = args.t5_checkpoint or t5_cfg["output_dir"]
-    print(f"[error_analysis] Loading T5 from {t5_checkpoint}")
-    t5_tokenizer = AutoTokenizer.from_pretrained(t5_checkpoint)
-    t5_model = AutoModelForSeq2SeqLM.from_pretrained(t5_checkpoint).to(device)
+        bart_summaries = [bart_all[idx]["prediction"] for idx in sampled_indices]
+        t5_summaries = [t5_all[idx]["prediction"] for idx in sampled_indices]
+    else:
+        # Load and generate with BART
+        bart_checkpoint = args.bart_checkpoint or bart_cfg["output_dir"]
+        print(f"[error_analysis] Loading BART from {bart_checkpoint}")
+        bart_tokenizer = AutoTokenizer.from_pretrained(bart_checkpoint)
+        bart_model = AutoModelForSeq2SeqLM.from_pretrained(bart_checkpoint).to(device)
+        if bart_cfg.get("fp16", False) and not on_mps:
+            bart_model.half()
 
-    print("[error_analysis] Generating T5 summaries...")
-    t5_summaries = generate_summaries_simple(
-        t5_model, t5_tokenizer, articles, decoding_cfg,
-        t5_cfg.get("source_prefix", ""), cfg["max_source_length"], device,
-    )
-    del t5_model, t5_tokenizer
+        print("[error_analysis] Generating BART summaries...")
+        bart_summaries = generate_summaries_simple(
+            bart_model, bart_tokenizer, articles, decoding_cfg,
+            bart_cfg.get("source_prefix", ""), cfg["max_source_length"], device,
+        )
+        del bart_model, bart_tokenizer
+        torch.cuda.empty_cache() if device.type == "cuda" else None
+
+        # Load and generate with T5
+        t5_checkpoint = args.t5_checkpoint or t5_cfg["output_dir"]
+        print(f"[error_analysis] Loading T5 from {t5_checkpoint}")
+        t5_tokenizer = AutoTokenizer.from_pretrained(t5_checkpoint)
+        t5_model = AutoModelForSeq2SeqLM.from_pretrained(t5_checkpoint).to(device)
+
+        print("[error_analysis] Generating T5 summaries...")
+        t5_summaries = generate_summaries_simple(
+            t5_model, t5_tokenizer, articles, decoding_cfg,
+            t5_cfg.get("source_prefix", ""), cfg["max_source_length"], device,
+        )
+        del t5_model, t5_tokenizer
 
     # Build blinded CSV: randomly assign BART/T5 to Summary A/B per article
     rng2 = random.Random(seed + 1)  # different seed for assignment shuffle
