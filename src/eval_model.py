@@ -16,7 +16,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+
+# Prevent transformers from attempting to import TensorFlow (avoids protobuf conflicts in Python 3.13)
+os.environ["USE_TF"] = "0"
+os.environ["TRANSFORMERS_NO_TF"] = "1"
+
 import time
 from pathlib import Path
 
