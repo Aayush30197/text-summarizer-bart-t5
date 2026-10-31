@@ -98,24 +98,32 @@ Before fine-tuning, both pre-trained models were evaluated in zero-shot mode on 
 > T5-base demonstrates a noticeable advantage in zero-shot ROUGE scores prior to fine-tuning. This is an expected artifact of T5's pre-training regimen: the original C4 pre-training corpus for T5 included multi-task supervised datasets, including CNN/DailyMail. Conversely, `facebook/bart-base` is a pure denoising autoencoder with zero task-specific supervised training. The decisive comparison occurs after both are fine-tuned on the identical 12,000-article partition.
 
 ### 4.2 Fine-Tuned Model Performance (Test Partition $N=1,000$)
-*(Populated from Kaggle GPU training run)*
+Both models were fine-tuned for 1.0 epoch (188 optimizer steps at effective batch size 32) on the identical 12,000-article training partition and evaluated on the 1,000-article test set under locked beam decoding (`num_beams: 4`, `min_length: 30`, `max_length: 128`):
 
-| Model | Fine-Tuning Steps | ROUGE-1 | ROUGE-2 | ROUGE-L | Mean Generation Latency (s/article) | Peak Memory (MB) |
-|---|---|---|---|---|---|---|
-| **BART-base** | 375 steps | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* |
-| **T5-base** | 375 steps | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* | *[Pending Kaggle Run]* |
+| Model | Fine-Tuning Steps | Train Loss | Val Loss | ROUGE-1 | ROUGE-2 | ROUGE-L | ROUGE-Lsum | Mean Latency (s/art) | Mean Tokens | Peak Memory |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **BART-base** | 188 steps (1 epoch) | 2.4891 | 1.8937 | **40.23%** | **17.71%** | **27.06%** | **37.01%** | **0.309s** (±0.060s) | 83.1 | 1,878 MB |
+| **T5-base** | 188 steps (1 epoch) | 1.6706 | 1.5300 | **42.88%** | **20.24%** | **30.12%** | **36.67%** | **0.569s** (±0.140s) | 100.3 | 1,898 MB |
+
+### 4.3 Baseline vs. Fine-Tuning Gain Analysis
+* **BART-base:** Increased ROUGE-1 from 27.87% to 40.23% (**+12.36% absolute gain**), ROUGE-2 from 9.95% to 17.71% (**+7.76% gain**), and ROUGE-L from 17.70% to 27.06% (**+9.36% gain**).
+* **T5-base:** Increased ROUGE-1 from 30.43% to 42.88% (**+12.45% absolute gain**), ROUGE-2 from 10.40% to 20.24% (**+9.84% gain**), and ROUGE-L from 21.55% to 30.12% (**+8.57% gain**).
+* **Synthesis:** Both models exhibit remarkably comparable fine-tuning leaps (~12.4% gain in ROUGE-1). T5-base maintains a slight lead of ~2.6 ROUGE points in overall overlap, largely inherited from its initial pre-training advantage.
 
 ---
 
 ## 5. Computational Efficiency & Hardware Profiling
 
-To answer **RQ4**, efficiency was benchmarked on both Apple Silicon (MacBook M4, 8-core GPU, 16 GB unified memory) and Cloud GPU (NVIDIA T4 16 GB):
-1. **Training Throughput:**
-   * BART-base benefits from fp16 mixed-precision training on NVIDIA Tensor Cores, yielding higher sample throughput.
-   * T5-base requires fp32 execution to avoid NaN gradient updates, resulting in higher VRAM utilization and slightly longer epoch runtimes.
-2. **Inference Latency:**
-   * Generation latency per article was averaged over 100 consecutive articles following a 5-sample warm-up.
-   * BART-base's SentencePiece/BPE token ratio and 6-layer decoder provide lower autoregressive generation step latency compared to T5-base's 12-layer decoder.
+To answer **RQ4**, efficiency was benchmarked on NVIDIA Tesla T4 (16 GB VRAM, CUDA 13.0):
+1. **Training Throughput & Convergence:**
+   * **BART-base** completed full training in **11 minutes 30 seconds** (17.38 samples/sec) using fp16 mixed precision.
+   * **T5-base** completed training in **21 minutes 52 seconds** (9.14 samples/sec) due to fp32 precision requirements.
+2. **Inference Latency & Interactivity:**
+   * Over 100 consecutive test evaluations, **BART-base achieved an average latency of 0.309s per article**, running **1.84× faster** than T5-base (**0.569s per article**).
+   * BART's shallower 6-layer decoder and BPE tokenization yield substantially faster token generation during beam exploration, making BART the superior architecture for interactive, latency-sensitive web deployment.
+3. **Generated Summary Length:**
+   * BART generated an average of **83.1 tokens** per summary, producing punchy, concise journalistic summaries.
+   * T5 generated an average of **100.3 tokens** per summary, favoring complete compound clauses.
 
 ---
 
