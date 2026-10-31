@@ -1,0 +1,41 @@
+# Base configuration shared by both models.
+# Model-specific overrides live in bart.yaml and t5.yaml.
+
+seed: 42
+
+# Dataset
+dataset_name: "abisee/cnn_dailymail"
+dataset_config: "3.0.0"
+
+# Subset sizes (final train size set after Oct 29 smoke test)
+train_subset_size: 12000
+val_subset_size: 1000
+test_subset_size: 1000
+smoke_subset_size: 50
+
+# Tokenization
+max_source_length: 512
+max_target_length: 128
+
+# Training
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 8  # effective batch size = 4 * 8 = 32
+num_train_epochs: 1
+weight_decay: 0.01
+lr_scheduler_type: "linear"
+warmup_steps: 37  # ~10% of ~375 total steps
+logging_steps: 10
+eval_steps: 100
+save_steps: 100
+save_total_limit: 3
+load_best_model_at_end: true
+metric_for_best_model: "eval_loss"
+greater_is_better: false
+predict_with_generate: false  # only at eval time, not during training validation (too slow)
+fp16: false  # overridden per model in bart.yaml; never on Mac
+
+# Paths
+output_dir: "checkpoints"
+data_dir: "data"
+results_dir: "results"

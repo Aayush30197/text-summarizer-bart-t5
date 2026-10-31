@@ -1,0 +1,7 @@
+# BART-specific overrides (inherits everything from base.yaml)
+
+model_name: "facebook/bart-base"
+learning_rate: 5.0e-5
+fp16: true  # OK on Kaggle CUDA; overridden to false on Mac at runtime
+source_prefix: ""  # BART uses plain text, no prefix
+output_dir: "checkpoints/bart-base"

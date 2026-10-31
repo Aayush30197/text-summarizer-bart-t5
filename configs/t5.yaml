@@ -1,0 +1,7 @@
+# T5-specific overrides (inherits everything from base.yaml)
+
+model_name: "t5-base"  # change to "t5-small" if Oct 29 smoke test fails
+learning_rate: 1.0e-4
+fp16: false  # T5 fp16 gives NaN losses; must stay fp32
+source_prefix: "summarize: "  # T5 requires task prefix
+output_dir: "checkpoints/t5-base"

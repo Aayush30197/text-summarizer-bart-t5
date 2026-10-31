@@ -1,0 +1,30 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+.cache/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Model weights, checkpoints & large binary artifacts
+checkpoints/
+models/
+*.pt
+*.bin
+*.safetensors
+*.onnx
+wandb/
+
+# Hugging Face caches
+hf_cache/

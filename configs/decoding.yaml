@@ -1,0 +1,10 @@
+# Fixed decoding configuration — shared by both models, never changed mid-project.
+# Adapted from common 142/56 settings to fit the 128-token target limit.
+# Document this adaptation in the report.
+
+num_beams: 4
+max_length: 128
+min_length: 30
+length_penalty: 2.0
+no_repeat_ngram_size: 3
+early_stopping: true
