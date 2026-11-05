@@ -188,9 +188,10 @@ Following completion of the double-blind human rating protocol across all 25 tes
 To satisfy course presentation requirements and test interactive viability, we developed an end-to-end Gradio web application (`app/app.py`).
 
 ### 7.1 Architecture & Features
-* **Curated Test Presets:** Dropdown containing 3–5 representative CNN/DailyMail articles alongside ground-truth human reference highlights.
-* **Live Side-by-Side Comparison:** Generates and displays BART and T5 summaries simultaneously in formatted response cards.
-* **Dynamic Parameter Sliders:** Real-time adjustment of `num_beams` (1 to 8), `min_length` (10 to 80), and `max_length` (60 to 200).
+* **Curated Test Spotlights:** Dropdown containing 4 representative case studies (`data/demo_articles.json`) loaded directly with verified fine-tuned predictions, ground-truth human references, and analytical commentary notes.
+* **Instant Offline Reliability:** Guarantees zero-latency comparison during live presentation without requiring local multi-gigabyte checkpoints or internet access.
+* **Live Side-by-Side Comparison:** Evaluates custom text inputs when local model checkpoints are supplied (`--bart-checkpoint`, `--t5-checkpoint`) with Apple Silicon MPS acceleration.
+* **Dynamic Parameter Sliders:** Real-time adjustment of `num_beams` (1 to 8), `min_length` (10 to 60), and `max_length` (50 to 200).
 * **Latency & Token Telemetry:** Displays instantaneous generation time (in seconds) and generated token length for each model.
 * **Graceful Degradation:** Detects missing local checkpoints and prompts the user with informative guidance rather than crashing.
 
@@ -207,9 +208,16 @@ In adherence to scientific rigor, several limitations must be noted:
 
 ---
 
-## 9. Conclusion
+## 9. Conclusion & Synthesis of Research Questions
 
-This capstone project establishes a complete, reproducible empirical pipeline comparing BART and T5 for abstractive summarization. By holding dataset partitions, evaluation implementations, and decoding strategies constant, our results isolate genuine architectural and objective differences between the two models. The accompanying Gradio web application bridges experimental results with interactive demonstration.
+This capstone project establishes a complete, reproducible empirical pipeline comparing BART and T5 for abstractive summarization on CNN/DailyMail. By holding dataset partitions, evaluation implementations, and decoding strategies constant, our experiments yield decisive answers to the core research questions:
+
+1. **RQ1 (Summarization Quality):** Both models achieve substantial and comparable improvements of **+12.4% absolute gain in ROUGE-1** over their untrained baselines. T5-base maintains a slight lead in lexical overlap (42.88% vs. 40.23% ROUGE-1, 30.12% vs. 27.06% ROUGE-L), primarily reflecting its multi-task pre-training corpus.
+2. **RQ2 (Information Preservation & Factuality):** In double-blind human evaluation, **BART-base achieved higher coverage (4.24 vs. 3.88)** and **higher factual consistency (4.88 vs. 4.68)**, demonstrating superior retention of core journalistic leads. The primary failure mode across both models was **critical fact omission (`OM`)** caused by length caps, while explicit hallucination (`EH`) was rare (1 occurrence in BART, 3 in T5).
+3. **RQ3 (Decoding Dynamics):** Frozen beam search with `num_beams=4` and `no_repeat_ngram_size=3` successfully eliminated degenerate repetition loops (`REP = 0`) across both architectures, with T5 generating longer, more compound sentences (100.3 vs. 83.1 tokens).
+4. **RQ4 (Computational Efficiency & Deployment Viability):** **BART-base is decisively superior for interactive web deployment**, delivering **1.84× faster inference latency (0.309s vs. 0.569s per article)**, half the training duration (11.5 min vs. 21.9 min), and stable fp16 execution on consumer/cloud GPUs without numerical instability.
+
+The accompanying Gradio web application bridges rigorous academic benchmarking with an intuitive, interactive demonstration tool suitable for real-time presentation and user exploration.
 
 ---
 
