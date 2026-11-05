@@ -1,0 +1,30 @@
+{
+  "mean_scores": {
+    "BART": {
+      "coverage": 4.24,
+      "factual_consistency": 4.88,
+      "readability": 4.32,
+      "redundancy": 4.0
+    },
+    "T5": {
+      "coverage": 3.88,
+      "factual_consistency": 4.68,
+      "readability": 4.4,
+      "redundancy": 4.16
+    }
+  },
+  "error_counts": {
+    "BART": {
+      "WE": 1,
+      "OM": 5,
+      "EH": 1
+    },
+    "T5": {
+      "WE": 1,
+      "OM": 8,
+      "EH": 3
+    }
+  },
+  "num_articles_rated": 25,
+  "note": "Single rater, small sample. See report for caveats."
+}

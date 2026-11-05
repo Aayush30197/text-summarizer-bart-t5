@@ -85,11 +85,12 @@
 ---
 
 ### Minute 8:30 – 9:30 | Slide 9: Double-Blind Error Analysis
-* **Visual:** Likert score radar chart and taxonomy error breakdown (Wrong Entity, Date Distortion, Hallucination, Omission).
+* **Visual:** Likert score breakdown (Coverage: BART 4.24 vs T5 3.88; Factual Consistency: BART 4.88 vs T5 4.68; Fluency: T5 4.40 vs BART 4.32) and taxonomy error counts (OM: 5 vs 8, EH: 1 vs 3, WE: 1 vs 1).
 * **Spoken Script:**
-  > *"Because ROUGE only measures lexical n-gram overlap, we conducted a double-blind human error analysis on 25 randomized test articles.*  
-  > *Summaries were shuffled into 'Summary A' and 'Summary B' with hidden keys.*  
-  > *The most frequent failure mode across both models was not outright hallucination, but **critical fact omission**—leaving out the final resolution of a news story—as well as occasional **numeric/date confusion**. T5 demonstrated slightly stronger factual consistency, while BART produced summaries with fewer redundant clauses."*
+  > *"Because ROUGE only measures lexical n-gram overlap, we conducted a double-blind human error analysis on 25 randomized test articles using a 1-to-5 Likert rubric and a 5-class error taxonomy.*  
+  > *Summaries were shuffled into anonymized 'Summary A' and 'Summary B' columns with model identities hidden in a key file.*  
+  > *The empirical results were revealing: BART scored higher in coverage—4.24 versus 3.88—and factual consistency—4.88 versus 4.68. The dominant error mode across both models was not hallucination, but **critical fact omission** due to the 128-token generation limit. However, we did discover rare, fascinating failure modes: for example, T5 hallucinated 'the Emirates stadium' instead of Selhurst Park for a Crystal Palace match, while BART once prepended a headline from a Virginia news story onto a South African article.*  
+  > *T5 achieved slightly higher readability (4.40 vs 4.32), primarily because BART occasionally truncated mid-sentence when hitting token limits."*
 
 ---
 

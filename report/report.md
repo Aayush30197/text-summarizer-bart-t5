@@ -148,6 +148,39 @@ Each sample was tagged for specific failure modes:
 * **Critical Fact Omission (OM):** Omitting the defining resolution or consequence of the news event.
 * **Repetition Loop (REP):** Cycling across duplicate phrases despite n-gram blocking.
 
+### 6.3 Qualitative Findings & Score Breakdown
+
+Following completion of the double-blind human rating protocol across all 25 test articles, the annotations were de-anonymized via `python src/error_analysis.py --deblind`. Table 4 summarizes the average 1–5 ratings, and Table 5 presents the observed failure mode frequencies.
+
+**Table 4: Double-Blind Human Evaluation Results (1–5 Likert Scale, N=25 articles)**
+| Metric | BART-base (Mean) | T5-base (Mean) | Δ (T5 − BART) | Qualitative Interpretation |
+|---|:---:|:---:|:---:|---|
+| **Coverage** | **4.24** | 3.88 | −0.36 | BART more reliably captures lead journalistic event facts. |
+| **Factual Consistency** | **4.88** | 4.68 | −0.20 | Both models exhibit high grounding; T5 had slightly more factual confusions. |
+| **Readability & Fluency** | 4.32 | **4.40** | +0.08 | T5 produces more syntactically finished, natural sentence structures. |
+| **Conciseness (Redundancy)** | 4.00 | **4.16** | +0.16 | T5 summaries exhibited slightly less n-gram re-phrasing. |
+
+**Table 5: Distribution of Qualitative Error Modes across 25 Evaluated Samples**
+| Error Category | Code | BART-base (Count) | T5-base (Count) | Primary Root Cause |
+|---|:---:|:---:|:---:|---|
+| **Critical Fact Omission** | `OM` | 5 | 8 | Truncation of later article paragraphs or conservative generation stopping. |
+| **Extrinsic Hallucination** | `EH` | 1 | 3 | Prior language model associations leaking into specialized domains. |
+| **Wrong Entity Attribution** | `WE` | 1 | 1 | Co-referent swapping between secondary actors and focal subjects. |
+| **Repetition Loop** | `REP` | 0 | 0 | Effectively eliminated in both models via `no_repeat_ngram_size=3`. |
+
+### 6.4 Error Analysis Case Studies
+
+1. **Hallucination of Extrinsic Context (BART, Article 0):**
+   * *Article Context:* A 15-year-old girl in Cape Town, South Africa, detained at the airport en route to join ISIS.
+   * *BART Generation:* `"Virginia teen accused of being ISIS recruiter . Police and airport security located the 15-year-old girl..."`
+   * *Analysis:* BART prepended an ungrounded snippet from another famous news story (a Virginia teen recruiter), demonstrating catastrophic pretraining retrieval interference before continuing with the factually accurate South African story.
+2. **Entity & Venue Confusion (T5, Article 7):**
+   * *Article Context:* Crystal Palace hosting Manchester City in a Premier League match at Selhurst Park.
+   * *T5 Generation:* `"Alan Pardew has refused to rule Manchester City out of the Premier League title race . Crystal Palace host City at the emirates on Monday night ."`
+   * *Analysis:* T5 accurately extracted the manager quotes and stakes, but hallucinated `"the emirates"` (Arsenal's stadium) as the host venue. This underscores the classic hazard of seq2seq models relying on high-frequency semantic collocates instead of grounded context.
+3. **Sentence Truncation and Discourse Boundaries:**
+   * In Article 6 (dog saving hunter) and Article 19 (car fire rescue), BART hit the 128-token limit mid-clause (`"...where he was listed in guarded"`), impacting its readability score (4.32 vs 4.40). T5 generally adhered more strictly to full-stop boundaries before exhausting length penalties.
+
 ---
 
 ## 7. Interactive Demonstration System
