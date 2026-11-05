@@ -76,11 +76,14 @@
 ### Minute 6:00 – 8:30 | LIVE DEMONSTRATION: Interactive Gradio App
 * **Visual:** Switch screen to the running Gradio Web App (`python app/app.py`).
 * **Demonstration Steps:**
-  1. **Example 1 (Balanced Performance):** Select pre-loaded Article 1 from the dropdown. Click **Summarize**. Point out the side-by-side comparison, ground truth reference, and generated token count.
-  2. **Parameter Adjustment (Beam Search Exploration):** Change `num_beams` from 4 to 1 (greedy). Click **Summarize**. Point out how latency drops by ~60%, but the summary exhibits slight phrasing repetition.
-  3. **Error Analysis Spotlight:** Select pre-loaded Article 2 (or a custom example). Point out a specific difference in how an entity or numerical figure was handled (e.g. date attribution or fact omission).
+  1. **Spotlight 1 (T5 Outperforms BART):** Select *"Spotlight 1: Cape Town ISIS Recruiter"* from the dropdown. Highlight the analytical callout: BART hallucinates a spurious headline (*"Virginia teen accused of being ISIS recruiter"*), while T5 remains completely grounded and faithful.
+  2. **Spotlight 2 (BART Outperforms T5):** Select *"Spotlight 2: Premier League Title Race"*. Point out that T5 hallucinates the stadium as *"the Emirates"* (Arsenal's ground) for Crystal Palace, whereas BART preserves accurate quotes and venue fidelity.
+  3. **Spotlight 3 (Coverage Contrast):** Select *"Spotlight 3: Reserve Deputy Shooting"*. Show how BART captures the critical event resolution (second-degree manslaughter charge in the death of Eric Harris), while T5 only reports training paperwork.
 * **Spoken Script:**
-  > *"Now I'd like to demonstrate the interactive Gradio app we built. Both models are served side by side. Here with Article 1, notice how both models capture the core event, but BART generates more concise sentences while T5 tends toward fuller clauses. When we adjust the beam slider from 4 down to 1, you can see the real-time latency drop on the telemetry counter, demonstrating the inference cost of beam exploration."*
+  > *"Now I'd like to demonstrate our interactive Gradio application. In this interface, both architectures are presented side by side alongside the human ground-truth reference summary and real-time telemetry.*  
+  > *First, let's examine Spotlight 1. Notice how BART hallucinates an external headline about a 'Virginia teen recruiter', whereas T5 remains strictly grounded in the Cape Town context.*  
+  > *Next, in Spotlight 2, we see the inverse: T5 hallucinates 'the Emirates stadium' for Crystal Palace, while BART maintains perfect venue fidelity.*  
+  > *Finally, our telemetry counters show BART running at 0.31s per article versus 0.57s for T5—demonstrating BART's 1.84x latency advantage for real-time applications."*
 
 ---
 

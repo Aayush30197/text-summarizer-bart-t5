@@ -349,7 +349,11 @@ def main():
 
     # Build and launch
     demo = build_ui()
-    demo.launch(share=args.share, server_port=args.port)
+    try:
+        demo.launch(share=args.share, server_name="127.0.0.1", server_port=args.port)
+    except OSError:
+        print(f"[demo] Port {args.port} is busy, finding next available port...")
+        demo.launch(share=args.share, server_name="127.0.0.1")
 
 
 if __name__ == "__main__":
