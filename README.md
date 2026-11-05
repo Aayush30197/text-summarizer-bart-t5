@@ -74,3 +74,16 @@ python src/train.py --model t5
 ```bash
 python app/app.py
 ```
+
+---
+
+## Key Results (1,000 Test Articles)
+
+| Model | Parameters | Precision | ROUGE-1 | ROUGE-2 | ROUGE-L | Latency (s/art) | Human Coverage (1–5) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **BART-base** | ~140M | fp16 | 40.23% | 17.71% | 27.06% | **0.309s** | **4.24** |
+| **T5-base** | ~220M | fp32 | **42.88%** | **20.24%** | **30.12%** | 0.569s | 3.88 |
+
+* **Interactive Viability:** BART runs **1.84× faster** during beam search exploration, making it optimal for real-time web deployment.
+* **Factual Grounding:** Both models exhibited high factual consistency (>4.6/5.0); dominant error mode was critical fact omission caused by generation length limits.
+* **Full Report:** See [`report/report.md`](report/report.md) for the complete academic analysis and [`report/PRESENTATION_SCRIPT.md`](report/PRESENTATION_SCRIPT.md) for the presentation guide.
