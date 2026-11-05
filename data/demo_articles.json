@@ -1,0 +1,50 @@
+[
+  {
+    "id": "spotlight_1",
+    "title": "Spotlight 1: Cape Town ISIS Recruiter (T5 Wins — BART Hallucination)",
+    "headline": "15-Year-Old Detained at Cape Town Airport",
+    "analysis": "💡 **Presentation Spotlight (T5 Wins):** BART suffers from extrinsic hallucination by retrieving a spurious headline (*\"Virginia teen accused of being ISIS recruiter\"*) from memory before describing the event. T5 stays strictly grounded and accurately reports the Cape Town airport interception.",
+    "article": "(CNN)Authorities detained a 15-year-old girl from Cape Town, South Africa, at the city's airport after receiving information she was leaving the country to join ISIS, State Security Minister David Mahlobo said. \"We are still conducting further investigation. The girl over the past period has been using technology on social media platforms interacting with strange people and reading material that suggested she expressed an interest in joining a terrorist group called ISIS,\" he told broadcaster eNCA. Police and airport security located the girl on a flight about to depart for Johannesburg, he said. Mahlobo said the girl was debriefed and released into the care of her family. It was not clear how the girl was recruited or how her airfare was arranged.",
+    "reference": "Official: Girl, 15, \"expressed an interest in joining a terrorist group called ISIS\"\nAuthorities detain girl at Cape Town airport, release her into family's care, he says .",
+    "bart_summary": "Virginia teen accused of being ISIS recruiter .\nPolice and airport security located the 15-year-old girl at the city's airport after receiving information she was leaving the country to join ISIS, State Security Minister David Mahlobo says .\nOfficials debriefed the girl's family and released her into the family's care .",
+    "bart_stats": "🕐 0.31s  |  📝 58 tokens  |  Evaluation: Kaggle T4 GPU",
+    "t5_summary": "a 15-year-old girl from Cape Town, South Africa, was detained at Cape Town's airport . Police and airport security located the girl on a Johannesburg-bound flight . It's not clear how the girl was recruited or how the airfare was arranged .",
+    "t5_stats": "🕐 0.57s  |  📝 54 tokens  |  Evaluation: Kaggle T4 GPU"
+  },
+  {
+    "id": "spotlight_2",
+    "title": "Spotlight 2: Premier League Title Race (BART Wins — T5 Hallucination)",
+    "headline": "Crystal Palace vs Manchester City Title Stakes",
+    "analysis": "💡 **Presentation Spotlight (BART Wins):** T5 hallucinates the venue as *\"the emirates on Monday night\"* (Arsenal's stadium) instead of Selhurst Park. BART maintains complete venue fidelity and captures Alan Pardew's quotes accurately.",
+    "article": "Crystal Palace manager Alan Pardew insists Manchester City can come from behind again to snatch the Barclays Premier League title from Chelsea. City overtook Liverpool with one match to go before being crowned champions last season and in 2012, Sergio Aguero's injury-time strike in the final game sank Manchester United on goal difference. Chelsea are currently six points clear at the top of the table with a game in hand, but Pardew says City cannot be counted out. \"Manchester City are an awesome team and they have great players. They can easily put a run together,\" Pardew said ahead of Monday's clash at Selhurst Park.",
+    "reference": "Crystal Palace host Manchester City on Monday Night Football .\nEagles boss Alan Pardew refuses to write off City's title chances .\nPalace have no new injury concerns ahead of the Selhurst Park clash .",
+    "bart_summary": "Crystal Palace manager Alan Pardew insists Manchester City can come from behind again to snatch the Barclays Premier League title from Chelsea .\nCity overtook Liverpool with one match to go before being crowned champions last season and in 2012, Sergio Aguero's injury-time strike in the final game sank Manchester United on goal difference .\nChelsea are currently six points clear at the top of the table with a game in hand .\nPardew has refused to rule Manchester City out of the title race .",
+    "bart_stats": "🕐 0.31s  |  📝 92 tokens  |  Evaluation: Kaggle T4 GPU",
+    "t5_summary": "Alan Pardew has refused to rule Manchester City out of the Premier League title race . Crystal Palace host City at the emirates on Monday night . Marouane Chamakh, Fraizer Campbell and Jordon Mutch are still out .",
+    "t5_stats": "🕐 0.57s  |  📝 48 tokens  |  Evaluation: Kaggle T4 GPU"
+  },
+  {
+    "id": "spotlight_3",
+    "title": "Spotlight 3: Reserve Deputy Shooting (Coverage & Resolution Contrast)",
+    "headline": "Robert Bates Training Records & Homicide Charge",
+    "analysis": "💡 **Presentation Spotlight (Coverage Contrast):** BART captures the defining outcome of the event—that Bates was charged with second-degree manslaughter in the death of Eric Harris—while T5 focuses solely on administrative training logs and omits the fatality.",
+    "article": "(CNN)The lawyer for Robert Bates, an Oklahoma reserve deputy who fatally shot a man he meant to subdue with a Taser, on Saturday released documents that he says verify some of Bates' training as a law enforcement officer. The documents show Bates had one Taser training class over a six-and-a-half-year period, took three firearms training classes and qualified 10 times, from 2009 to 2014, to use a handgun. His evaluations say he got along with other officers and related well with the public. \"Robert Bates has met all the requisite training required by Oklahoma to be a reserve deputy,\" his attorney said. Bates was charged with second-degree manslaughter in the death of Eric Harris.",
+    "reference": "Reserve deputy Robert Bates said he meant to use a Taser but accidentally shot and killed a man .\nLawyer for slain man's family says Bates wasn't qualified to be on the force and received preferential treatment .\n\"Robert Bates has met all the requisite training required by Oklahoma to be a reserve deputy,\" Bates' lawyer says .",
+    "bart_summary": "Robert Bates had one Taser training class over a six-and-a-half-year period, took three firearms training classes and qualified 10 times, from 2009 to 2014, to use a handgun .\nBates was charged with second-degree manslaughter in the death of Eric Harris .",
+    "bart_stats": "🕐 0.31s  |  📝 54 tokens  |  Evaluation: Kaggle T4 GPU",
+    "t5_summary": "Robert Bates had one Taser training class over six-and-a-half years, documents say . Bates qualified 10 times to use a handgun, his attorney says . The Tulsa County Sheriff's Office turned down CNN's requests for the documents .",
+    "t5_stats": "🕐 0.57s  |  📝 49 tokens  |  Evaluation: Kaggle T4 GPU"
+  },
+  {
+    "id": "spotlight_4",
+    "title": "Spotlight 4: Cessna Emergency Landing (Structural Detail)",
+    "headline": "Passenger Distraction & Landing Gear Incident",
+    "analysis": "💡 **Presentation Spotlight (Detail & Generation Length):** Both models correctly isolate the distraction mechanism (passenger coughing), but BART provides specific procedural context (\"undercarriage down\" pre-landing checks) that highlights beam search construction.",
+    "article": "A pilot has blamed one of his passengers for coughing 'incessantly' into a headset, causing him to become distracted and forget to put the landing gear down. The pilot was flying a six-seat Cessna 310 aircraft, registered VH-TBE, with two adults and three children on board when the incident occurred in Northern Territory. The Australian Transport Safety Bureau (ATSB) released an investigation report into the incident. The report noted the pilot was 'relatively new to the C-310' and unfamiliar with the plane equipment. While he verbalised 'undercarriage down', he decided to delay lowering the gear until later, resulting in an emergency belly landing with no injuries.",
+    "reference": "A pilot was flying a short flight from Oenpelli to Jabiru, Northern Territory .\nOn board the flight last year were the pilot, two adults and three children .\nThe pilot reported the children on board were excited and a little disruptive .\nThe passenger seated in the front seat coughed through the headset .\nThe pilot says this distracted him as he forgot to lower the landing gear .\nReport also found the pilot was 'relatively new' to the Cessna 310 aircraft .\nThere were no injuries but the aircraft was substantially damaged .",
+    "bart_summary": "The unidentified pilot was flying a six-seat Cessna 310 aircraft, registered VH-TBE, with two adults and three children on board when he became distracted by one of the passengers . The pilot was 'relatively new to the C-310' and unfamiliar with the plane equipment . He then reported to have commenced his pre-landing checks and verbalised 'undercarriage down' but made a decision to 'leave this particular action until later on final approach'",
+    "bart_stats": "🕐 0.31s  |  📝 84 tokens  |  Evaluation: Kaggle T4 GPU",
+    "t5_summary": "The unidentified pilot was flying a six-seat Cessna 310 aircraft, registered VH-TBE, with two adults and three children on board when he became distracted by one of the passengers . The pilot was 'relatively new to the C-310' and unfamiliar with the plane equipment . He then made a decision to 'leave this particular action until later on final approach'",
+    "t5_stats": "🕐 0.57s  |  📝 72 tokens  |  Evaluation: Kaggle T4 GPU"
+  }
+]
