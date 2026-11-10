@@ -10,15 +10,24 @@
 
 ## Abstract
 
-Abstractive text summarization requires condensing long documents into coherent, fluent, and factually accurate summaries while generating novel phrasing not present in the source. This project investigates and compares two prominent transformer architectures—Bidirectional and Auto-Regressive Transformers (**BART-base**, ~140M parameters) and the Text-to-Text Transfer Transformer (**T5-base**, ~220M parameters)—on the non-anonymized CNN/DailyMail benchmark. We design a rigorous, reproducible experimental pipeline that evaluates zero-shot pre-trained baselines, performs fine-tuning under strictly identical hyperparameters and fixed data subsets (12,000 training, 1,000 validation, and 1,000 test articles), and benchmarks both models using automated ROUGE metrics, inference latency, peak memory consumption, and a double-blind qualitative error analysis on 25 test samples. Finally, we implement an interactive side-by-side Gradio application designed for live demonstration and latency profiling.
+Text summarization is the process of distilling a long document into a concise version that preserves the most critical information. While traditional *extractive* summarization functions like a highlighter—simply copying existing sentences from the original article—modern natural language processing focuses on *abstractive* summarization. Much like a human taking study notes, an abstractive model reads the full document, comprehends the narrative, and synthesizes key points into brand-new, fluent sentences. 
+
+This project investigates and compares two prominent transformer architectures—Bidirectional and Auto-Regressive Transformers (**BART-base**, ~140M parameters) and the Text-to-Text Transfer Transformer (**T5-base**, ~220M parameters)—on the non-anonymized CNN/DailyMail benchmark. We design a rigorous, reproducible experimental pipeline that evaluates zero-shot pre-trained baselines, performs fine-tuning under strictly identical hyperparameters and fixed data subsets (12,000 training, 1,000 validation, and 1,000 test articles), and benchmarks both models using automated ROUGE metrics, inference latency, peak memory consumption, and a double-blind qualitative error analysis on 25 test samples. Finally, we implement an interactive side-by-side Gradio application designed for live demonstration and latency profiling.
 
 ---
 
 ## 1. Introduction & Research Questions
 
-Modern abstractive summarization benchmarks are dominated by encoder-decoder transformer models pre-trained on massive text corpora via self-supervised denoising objectives. However, architectural paradigms differ significantly in their pre-training objectives, tokenization schemes, and handling of task conditioning:
-* **BART** combines a bidirectional encoder (similar to BERT) with an autoregressive sequence-to-sequence decoder (similar to GPT), pre-trained to reconstruct corrupted text using token masking, deletion, and document rotation.
-* **T5** treats every NLP task as a string-to-string transformation, pre-trained on C4 with masked span prediction, and conditions generation using explicit natural language task prefixes (e.g., `summarize: `).
+In everyday information consumption, humans face a deluge of long-form articles, research papers, and news updates. Automating the synthesis of these documents is a foundational objective of Natural Language Processing (NLP). 
+
+### 1.1 The Two Paradigms: Extractive vs. Abstractive Summarization
+1. **Extractive Summarization:** Functions like a yellow highlighter in a textbook. It scores sentences within the original text and extracts top-ranked sentences verbatim. While grammatically guaranteed to be correct and computationally cheap, the resulting summaries often read disjointedly and cannot combine facts or synthesize novel phrasing.
+2. **Abstractive Summarization:** Functions like a human reader synthesizing notes. The model parses the source text into high-dimensional semantic representations and generates novel sentences token-by-token. This approach produces coherent, natural summaries, but introduces serious technical risks: the model may "hallucinate" untrue facts, misattribute actions, or omit the defining climax of a story.
+
+### 1.2 Architectural Paradigms: BART vs. T5
+Modern abstractive summarization benchmarks are dominated by encoder-decoder transformer models pre-trained on massive text corpora via self-supervised objectives:
+* **BART (Bidirectional and Auto-Regressive Transformer):** Developed by Meta / Facebook, BART combines a bidirectional encoder (which reads sentences from left-to-right and right-to-left simultaneously, like BERT) with an autoregressive sequence-to-sequence decoder (which generates words one by one, like GPT). BART is pre-trained as a *denoising autoencoder*: researchers intentionally corrupted clean text—erasing words with blanks, deleting tokens, and scrambling sentences—and trained BART to reconstruct the original, clean text. This pre-training makes BART inherently adept at editing, reorganizing, and condensing text.
+* **T5 (Text-to-Text Transfer Transformer):** Developed by Google, T5 reframes every natural language processing task—whether translation, sentiment analysis, question answering, or summarization—into a unified text-to-text format. Rather than having a task-specific classification head, T5 is conditioned using explicit natural language prefixes. To trigger news summarization, the model is fed the prompt: `summarize: [article text]`.
 
 ### Research Questions
 1. **RQ1 (Summarization Quality):** How do fine-tuned BART-base and T5-base compare in abstractive summary quality when evaluated via standardized ROUGE-1, ROUGE-2, and ROUGE-L metrics under strictly matched training regimes?
