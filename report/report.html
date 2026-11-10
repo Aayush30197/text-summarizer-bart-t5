@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comparative Evaluation of BART and T5 for Abstractive Summarization | Final Capstone Report</title>
+  <style>
+    @page {
+      size: letter;
+      margin: 0.8in;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    :root {
+      --primary: #1e3a8a;
+      --text: #1f2937;
+      --text-muted: #4b5563;
+      --bg: #ffffff;
+      --border: #e5e7eb;
+      --code-bg: #f3f4f6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Charter", "Georgia", "Cambria", serif;
+      color: var(--text);
+      background-color: #f8fafc;
+      line-height: 1.68;
+      font-size: 15px;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Floating Print / PDF Header */
+    .action-bar {
+      position: sticky;
+      top: 0;
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 100;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .btn-print {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .btn-print:hover { background: #7dd3fc; }
+
+    .paper-container {
+      max-width: 860px;
+      margin: 36px auto;
+      background: white;
+      padding: 60px 70px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    /* Typography */
+    h1 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .meta-box {
+      text-align: center;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    h2 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 24px;
+      margin-bottom: 10px;
+    }
+
+    h4 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin-bottom: 14px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin: 10px 0 16px 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    /* Blockquotes & Callouts */
+    blockquote {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 12px 18px;
+      margin: 16px 0;
+      color: #14532d;
+      font-size: 14px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13.5px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    th, td {
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Code */
+    code {
+      font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+      background: var(--code-bg);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #0369a1;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 14px 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 16px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin: 28px 0;
+    }
+
+    /* Print Stylesheet for Canvas PDF Export */
+    @media print {
+      body {
+        background: white;
+        font-size: 13pt;
+      }
+      .action-bar {
+        display: none !important;
+      }
+      .paper-container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+      }
+      h2 {
+        page-break-after: avoid;
+      }
+      table, pre, blockquote {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="action-bar">
+    <div>
+      <strong>CSCI 390 Final Capstone Report</strong> — Fisk University
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <span style="font-size: 13px; color: #94a3b8;">Click button or press Cmd+P to Save as PDF</span>
+      <button class="btn-print" onclick="window.print()">
+        📄 Save as Canvas PDF (Print)
+      </button>
+    </div>
+  </div>
+
+  <div class="paper-container">
+    <h1>Comparative Evaluation of BART and T5 for Abstractive Text Summarization</h1>
+<p><strong>Course:</strong> CSCI 390 (Senior Capstone / Advanced NLP)<br />
+<strong>Institution:</strong> Fisk University<br />
+<strong>Instructor:</strong> Dr. Qi Li<br />
+<strong>Author:</strong> Aayush Khanal<br />
+<strong>Date:</strong> Fall 2026</p>
+<hr />
+<h2>Abstract</h2>
+<p>Abstractive text summarization requires condensing long documents into coherent, fluent, and factually accurate summaries while generating novel phrasing not present in the source. This project investigates and compares two prominent transformer architectures—Bidirectional and Auto-Regressive Transformers (<strong>BART-base</strong>, ~140M parameters) and the Text-to-Text Transfer Transformer (<strong>T5-base</strong>, ~220M parameters)—on the non-anonymized CNN/DailyMail benchmark. We design a rigorous, reproducible experimental pipeline that evaluates zero-shot pre-trained baselines, performs fine-tuning under strictly identical hyperparameters and fixed data subsets (12,000 training, 1,000 validation, and 1,000 test articles), and benchmarks both models using automated ROUGE metrics, inference latency, peak memory consumption, and a double-blind qualitative error analysis on 25 test samples. Finally, we implement an interactive side-by-side Gradio application designed for live demonstration and latency profiling.</p>
+<hr />
+<h2>1. Introduction &amp; Research Questions</h2>
+<p>Modern abstractive summarization benchmarks are dominated by encoder-decoder transformer models pre-trained on massive text corpora via self-supervised denoising objectives. However, architectural paradigms differ significantly in their pre-training objectives, tokenization schemes, and handling of task conditioning:</p>
+<ul>
+<li><strong>BART</strong> combines a bidirectional encoder (similar to BERT) with an autoregressive sequence-to-sequence decoder (similar to GPT), pre-trained to reconstruct corrupted text using token masking, deletion, and document rotation.</li>
+<li><strong>T5</strong> treats every NLP task as a string-to-string transformation, pre-trained on C4 with masked span prediction, and conditions generation using explicit natural language task prefixes (e.g., <code>summarize: </code>).</li>
+</ul>
+<h3>Research Questions</h3>
+<ol>
+<li><strong>RQ1 (Summarization Quality):</strong> How do fine-tuned BART-base and T5-base compare in abstractive summary quality when evaluated via standardized ROUGE-1, ROUGE-2, and ROUGE-L metrics under strictly matched training regimes?</li>
+<li><strong>RQ2 (Information Preservation &amp; Factual Consistency):</strong> How faithfully do the generated summaries preserve core source facts, and what error patterns (e.g., entity hallucination, date distortion, or omissions) emerge most frequently?</li>
+<li><strong>RQ3 (Decoding Sensitivity):</strong> How do beam search constraints (beam size, length penalties, and n-gram blocking) influence summary informativeness, redundancy, and repetition?</li>
+<li><strong>RQ4 (Computational Efficiency &amp; Interactive Viability):</strong> How do the models compare in terms of inference latency, peak memory footprint, and feasibility for real-time web deployment?</li>
+</ol>
+<hr />
+<h2>2. Dataset &amp; Preprocessing Pipeline</h2>
+<h3>2.1 Benchmark Selection: CNN/DailyMail 3.0.0</h3>
+<p>We evaluate on the standard non-anonymized Hugging Face release of <code>abisee/cnn_dailymail</code> (version <code>3.0.0</code>). The canonical split distribution is:</p>
+<ul>
+<li><strong>Full Train:</strong> 287,113 document-highlight pairs</li>
+<li><strong>Full Validation:</strong> 13,368 document-highlight pairs</li>
+<li><strong>Full Test:</strong> 11,490 document-highlight pairs</li>
+</ul>
+<h3>2.2 Controlled Subsetting &amp; Reproducibility</h3>
+<p>Given computational resource constraints (MacBook M4 for local development and Kaggle T4 cloud GPU for full training), training on the entire 287k corpus is computationally prohibitive within our calendar schedule. To eliminate selection bias and prevent data leakage:</p>
+<ol>
+<li>Subsets were randomly sampled once using seed <code>42</code> and serialized to immutable index files:
+<ul>
+<li><code>data/indices_train.json</code> ($N = 12,000$)</li>
+<li><code>data/indices_validation.json</code> ($N = 1,000$)</li>
+<li><code>data/indices_test.json</code> ($N = 1,000$)</li>
+</ul>
+</li>
+<li>Validation and test sets are strictly disjoint from the training partition.</li>
+<li>All baseline, fine-tuning, and evaluation scripts consume these exact index sets.</li>
+</ol>
+<h3>2.3 Tokenization and Truncation Trade-offs</h3>
+<ul>
+<li><strong>Max Source Length:</strong> 512 tokens.</li>
+<li><strong>Max Target Length:</strong> 128 tokens.</li>
+<li><strong>Padding &amp; Masking:</strong> Padded labels are assigned <code>-100</code> so that pad tokens are ignored by the cross-entropy loss function via <code>DataCollatorForSeq2Seq</code>.</li>
+<li><strong>Truncation Analysis:</strong> In news summarization, news articles often exceed 700–1,000 words. Truncating at 512 tokens forces both models to summarize predominantly from the lead paragraphs (the &quot;inverted pyramid&quot; style typical of journalistic writing).</li>
+</ul>
+<hr />
+<h2>3. Experimental Setup &amp; Training Configuration</h2>
+<h3>3.1 Model Specifications</h3>
+<ul>
+<li><strong>BART-base (<code>facebook/bart-base</code>):</strong> 6 encoder layers, 6 decoder layers, 12 attention heads, hidden dimension 768 (~140M parameters). Byte-Pair Encoding (BPE) vocabulary of 50,265 tokens.</li>
+<li><strong>T5-base (<code>t5-base</code>):</strong> 12 encoder layers, 12 decoder layers, 12 attention heads, hidden dimension 768 (~220M parameters). SentencePiece vocabulary of 32,128 tokens. Requires input prefix <code>summarize: </code>.</li>
+</ul>
+<h3>3.2 Hyperparameter Parity</h3>
+<p>To guarantee a fair comparison, both models share identical training mechanics where possible:</p>
+<table>
+<thead>
+<tr>
+<th>Hyperparameter</th>
+<th>BART-base</th>
+<th>T5-base</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Training Articles</strong></td>
+<td>12,000</td>
+<td>12,000</td>
+<td>Fixed subset from <code>indices_train.json</code></td>
+</tr>
+<tr>
+<td><strong>Epochs</strong></td>
+<td>1.0 (~375 steps)</td>
+<td>1.0 (~375 steps)</td>
+<td>Avoids overfitting on small subsets</td>
+</tr>
+<tr>
+<td><strong>Effective Batch Size</strong></td>
+<td>32 (4 per device × 8 grad accum)</td>
+<td>32 (4 per device × 8 grad accum)</td>
+<td>Matched gradient dynamics</td>
+</tr>
+<tr>
+<td><strong>Optimizer</strong></td>
+<td>AdamW ($\beta_1=0.9, \beta_2=0.999$)</td>
+<td>AdamW ($\beta_1=0.9, \beta_2=0.999$)</td>
+<td>Standard transformer optimizer</td>
+</tr>
+<tr>
+<td><strong>Weight Decay</strong></td>
+<td>0.01</td>
+<td>0.01</td>
+<td>L2 regularization</td>
+</tr>
+<tr>
+<td><strong>Learning Rate</strong></td>
+<td>$5 \times 10^{-5}$</td>
+<td>$1 \times 10^{-4}$</td>
+<td>Recommended baseline ranges for BART/T5</td>
+</tr>
+<tr>
+<td><strong>Warmup Ratio</strong></td>
+<td>~10% (38 steps)</td>
+<td>~10% (38 steps)</td>
+<td>Linear warmup followed by linear decay</td>
+</tr>
+<tr>
+<td><strong>Precision</strong></td>
+<td>fp16 (on CUDA)</td>
+<td><strong>fp32</strong></td>
+<td>T5 exhibits numerical instability (NaN loss) in fp16 on T4 GPUs</td>
+</tr>
+<tr>
+<td><strong>Evaluation / Checkpointing</strong></td>
+<td>Every 100 steps</td>
+<td>Every 100 steps</td>
+<td>Best checkpoint selected via validation loss</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 Locked Decoding Configuration</h3>
+<p>During inference and evaluation, decoding parameters are locked in <code>configs/decoding.yaml</code>:</p>
+<ul>
+<li><strong>Beam search:</strong> <code>num_beams = 4</code></li>
+<li><strong>Length bounds:</strong> <code>min_length = 30</code>, <code>max_length = 128</code></li>
+<li><strong>Length penalty:</strong> <code>length_penalty = 2.0</code></li>
+<li><strong>Repetition control:</strong> <code>no_repeat_ngram_size = 3</code></li>
+<li><strong>Early stopping:</strong> <code>early_stopping = True</code></li>
+</ul>
+<hr />
+<h2>4. Empirical Results &amp; Findings</h2>
+<h3>4.1 Zero-Shot Pre-Trained Baselines</h3>
+<p>Before fine-tuning, both pre-trained models were evaluated in zero-shot mode on the first 50 test samples using Apple Silicon MPS acceleration to measure baseline generation capacity:</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Checkpoint Status</th>
+<th>ROUGE-1</th>
+<th>ROUGE-2</th>
+<th>ROUGE-L</th>
+<th>ROUGE-Lsum</th>
+<th>Peak Memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BART-base</strong></td>
+<td>Zero-shot (Untrained)</td>
+<td>27.87%</td>
+<td>9.95%</td>
+<td>17.70%</td>
+<td>21.27%</td>
+<td>1,916 MB</td>
+</tr>
+<tr>
+<td><strong>T5-base</strong></td>
+<td>Zero-shot (<code>summarize: </code>)</td>
+<td><strong>30.43%</strong></td>
+<td><strong>10.40%</strong></td>
+<td><strong>21.55%</strong></td>
+<td><strong>24.57%</strong></td>
+<td><strong>1,415 MB</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Critical Empirical Note on Baseline Asymmetry:</strong><br />
+T5-base demonstrates a noticeable advantage in zero-shot ROUGE scores prior to fine-tuning. This is an expected artifact of T5's pre-training regimen: the original C4 pre-training corpus for T5 included multi-task supervised datasets, including CNN/DailyMail. Conversely, <code>facebook/bart-base</code> is a pure denoising autoencoder with zero task-specific supervised training. The decisive comparison occurs after both are fine-tuned on the identical 12,000-article partition.</p>
+</blockquote>
+<h3>4.2 Fine-Tuned Model Performance (Test Partition $N=1,000$)</h3>
+<p>Both models were fine-tuned for 1.0 epoch (188 optimizer steps at effective batch size 32) on the identical 12,000-article training partition and evaluated on the 1,000-article test set under locked beam decoding (<code>num_beams: 4</code>, <code>min_length: 30</code>, <code>max_length: 128</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Fine-Tuning Steps</th>
+<th>Train Loss</th>
+<th>Val Loss</th>
+<th>ROUGE-1</th>
+<th>ROUGE-2</th>
+<th>ROUGE-L</th>
+<th>ROUGE-Lsum</th>
+<th>Mean Latency (s/art)</th>
+<th>Mean Tokens</th>
+<th>Peak Memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BART-base</strong></td>
+<td>188 steps (1 epoch)</td>
+<td>2.4891</td>
+<td>1.8937</td>
+<td><strong>40.23%</strong></td>
+<td><strong>17.71%</strong></td>
+<td><strong>27.06%</strong></td>
+<td><strong>37.01%</strong></td>
+<td><strong>0.309s</strong> (±0.060s)</td>
+<td>83.1</td>
+<td>1,878 MB</td>
+</tr>
+<tr>
+<td><strong>T5-base</strong></td>
+<td>188 steps (1 epoch)</td>
+<td>1.6706</td>
+<td>1.5300</td>
+<td><strong>42.88%</strong></td>
+<td><strong>20.24%</strong></td>
+<td><strong>30.12%</strong></td>
+<td><strong>36.67%</strong></td>
+<td><strong>0.569s</strong> (±0.140s)</td>
+<td>100.3</td>
+<td>1,898 MB</td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 Baseline vs. Fine-Tuning Gain Analysis</h3>
+<ul>
+<li><strong>BART-base:</strong> Increased ROUGE-1 from 27.87% to 40.23% (<strong>+12.36% absolute gain</strong>), ROUGE-2 from 9.95% to 17.71% (<strong>+7.76% gain</strong>), and ROUGE-L from 17.70% to 27.06% (<strong>+9.36% gain</strong>).</li>
+<li><strong>T5-base:</strong> Increased ROUGE-1 from 30.43% to 42.88% (<strong>+12.45% absolute gain</strong>), ROUGE-2 from 10.40% to 20.24% (<strong>+9.84% gain</strong>), and ROUGE-L from 21.55% to 30.12% (<strong>+8.57% gain</strong>).</li>
+<li><strong>Synthesis:</strong> Both models exhibit remarkably comparable fine-tuning leaps (~12.4% gain in ROUGE-1). T5-base maintains a slight lead of ~2.6 ROUGE points in overall overlap, largely inherited from its initial pre-training advantage.</li>
+</ul>
+<hr />
+<h2>5. Computational Efficiency &amp; Hardware Profiling</h2>
+<p>To answer <strong>RQ4</strong>, efficiency was benchmarked on NVIDIA Tesla T4 (16 GB VRAM, CUDA 13.0):</p>
+<ol>
+<li><strong>Training Throughput &amp; Convergence:</strong>
+<ul>
+<li><strong>BART-base</strong> completed full training in <strong>11 minutes 30 seconds</strong> (17.38 samples/sec) using fp16 mixed precision.</li>
+<li><strong>T5-base</strong> completed training in <strong>21 minutes 52 seconds</strong> (9.14 samples/sec) due to fp32 precision requirements.</li>
+</ul>
+</li>
+<li><strong>Inference Latency &amp; Interactivity:</strong>
+<ul>
+<li>Over 100 consecutive test evaluations, <strong>BART-base achieved an average latency of 0.309s per article</strong>, running <strong>1.84× faster</strong> than T5-base (<strong>0.569s per article</strong>).</li>
+<li>BART's shallower 6-layer decoder and BPE tokenization yield substantially faster token generation during beam exploration, making BART the superior architecture for interactive, latency-sensitive web deployment.</li>
+</ul>
+</li>
+<li><strong>Generated Summary Length:</strong>
+<ul>
+<li>BART generated an average of <strong>83.1 tokens</strong> per summary, producing punchy, concise journalistic summaries.</li>
+<li>T5 generated an average of <strong>100.3 tokens</strong> per summary, favoring complete compound clauses.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>6. Qualitative Error Analysis</h2>
+<p>Automated ROUGE scores capture lexical n-gram overlap but fail to evaluate factual faithfulness, hallucination, or discourse coherence. To address <strong>RQ2</strong>, we implemented a double-blind human rating protocol (<code>src/error_analysis.py</code>).</p>
+<h3>6.1 Evaluation Methodology</h3>
+<ul>
+<li>A fixed random sample of 25 test articles was extracted (<code>seed=42</code>).</li>
+<li>Summaries from fine-tuned BART and T5 were shuffled into anonymized columns (<code>Summary A</code> vs. <code>Summary B</code>), with model identities stored in a secure separate key file.</li>
+<li>Each summary was evaluated on a 1–5 Likert scale across four dimensions:
+<ol>
+<li><strong>Coverage:</strong> Does the summary capture the main news event?</li>
+<li><strong>Factual Consistency:</strong> Is all information directly verifiable from the source article?</li>
+<li><strong>Readability &amp; Fluency:</strong> Is the text grammatical, natural, and well-structured?</li>
+<li><strong>Conciseness / Redundancy:</strong> Is the summary free of repetitive phrasing and filler content?</li>
+</ol>
+</li>
+</ul>
+<h3>6.2 Error Taxonomy</h3>
+<p>Each sample was tagged for specific failure modes:</p>
+<ul>
+<li><strong>Wrong Entity (WE):</strong> Attributing actions to the wrong person, organization, or location.</li>
+<li><strong>Numeric / Date Distortion (ND):</strong> Misreporting quantities, ages, financial figures, or dates.</li>
+<li><strong>Extrinsic Hallucination (EH):</strong> Introducing facts not grounded anywhere in the source text.</li>
+<li><strong>Critical Fact Omission (OM):</strong> Omitting the defining resolution or consequence of the news event.</li>
+<li><strong>Repetition Loop (REP):</strong> Cycling across duplicate phrases despite n-gram blocking.</li>
+</ul>
+<h3>6.3 Qualitative Findings &amp; Score Breakdown</h3>
+<p>Following completion of the double-blind human rating protocol across all 25 test articles, the annotations were de-anonymized via <code>python src/error_analysis.py --deblind</code>. Table 4 summarizes the average 1–5 ratings, and Table 5 presents the observed failure mode frequencies.</p>
+<p><strong>Table 4: Double-Blind Human Evaluation Results (1–5 Likert Scale, N=25 articles)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th style="text-align:center">BART-base (Mean)</th>
+<th style="text-align:center">T5-base (Mean)</th>
+<th style="text-align:center">Δ (T5 − BART)</th>
+<th>Qualitative Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Coverage</strong></td>
+<td style="text-align:center"><strong>4.24</strong></td>
+<td style="text-align:center">3.88</td>
+<td style="text-align:center">−0.36</td>
+<td>BART more reliably captures lead journalistic event facts.</td>
+</tr>
+<tr>
+<td><strong>Factual Consistency</strong></td>
+<td style="text-align:center"><strong>4.88</strong></td>
+<td style="text-align:center">4.68</td>
+<td style="text-align:center">−0.20</td>
+<td>Both models exhibit high grounding; T5 had slightly more factual confusions.</td>
+</tr>
+<tr>
+<td><strong>Readability &amp; Fluency</strong></td>
+<td style="text-align:center">4.32</td>
+<td style="text-align:center"><strong>4.40</strong></td>
+<td style="text-align:center">+0.08</td>
+<td>T5 produces more syntactically finished, natural sentence structures.</td>
+</tr>
+<tr>
+<td><strong>Conciseness (Redundancy)</strong></td>
+<td style="text-align:center">4.00</td>
+<td style="text-align:center"><strong>4.16</strong></td>
+<td style="text-align:center">+0.16</td>
+<td>T5 summaries exhibited slightly less n-gram re-phrasing.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Table 5: Distribution of Qualitative Error Modes across 25 Evaluated Samples</strong></p>
+<table>
+<thead>
+<tr>
+<th>Error Category</th>
+<th style="text-align:center">Code</th>
+<th style="text-align:center">BART-base (Count)</th>
+<th style="text-align:center">T5-base (Count)</th>
+<th>Primary Root Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Critical Fact Omission</strong></td>
+<td style="text-align:center"><code>OM</code></td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">8</td>
+<td>Truncation of later article paragraphs or conservative generation stopping.</td>
+</tr>
+<tr>
+<td><strong>Extrinsic Hallucination</strong></td>
+<td style="text-align:center"><code>EH</code></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">3</td>
+<td>Prior language model associations leaking into specialized domains.</td>
+</tr>
+<tr>
+<td><strong>Wrong Entity Attribution</strong></td>
+<td style="text-align:center"><code>WE</code></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td>Co-referent swapping between secondary actors and focal subjects.</td>
+</tr>
+<tr>
+<td><strong>Repetition Loop</strong></td>
+<td style="text-align:center"><code>REP</code></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td>Effectively eliminated in both models via <code>no_repeat_ngram_size=3</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3>6.4 Error Analysis Case Studies</h3>
+<ol>
+<li><strong>Hallucination of Extrinsic Context (BART, Article 0):</strong>
+<ul>
+<li><em>Article Context:</em> A 15-year-old girl in Cape Town, South Africa, detained at the airport en route to join ISIS.</li>
+<li><em>BART Generation:</em> <code>&quot;Virginia teen accused of being ISIS recruiter . Police and airport security located the 15-year-old girl...&quot;</code></li>
+<li><em>Analysis:</em> BART prepended an ungrounded snippet from another famous news story (a Virginia teen recruiter), demonstrating catastrophic pretraining retrieval interference before continuing with the factually accurate South African story.</li>
+</ul>
+</li>
+<li><strong>Entity &amp; Venue Confusion (T5, Article 7):</strong>
+<ul>
+<li><em>Article Context:</em> Crystal Palace hosting Manchester City in a Premier League match at Selhurst Park.</li>
+<li><em>T5 Generation:</em> <code>&quot;Alan Pardew has refused to rule Manchester City out of the Premier League title race . Crystal Palace host City at the emirates on Monday night .&quot;</code></li>
+<li><em>Analysis:</em> T5 accurately extracted the manager quotes and stakes, but hallucinated <code>&quot;the emirates&quot;</code> (Arsenal's stadium) as the host venue. This underscores the classic hazard of seq2seq models relying on high-frequency semantic collocates instead of grounded context.</li>
+</ul>
+</li>
+<li><strong>Sentence Truncation and Discourse Boundaries:</strong>
+<ul>
+<li>In Article 6 (dog saving hunter) and Article 19 (car fire rescue), BART hit the 128-token limit mid-clause (<code>&quot;...where he was listed in guarded&quot;</code>), impacting its readability score (4.32 vs 4.40). T5 generally adhered more strictly to full-stop boundaries before exhausting length penalties.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>7. Interactive Demonstration System</h2>
+<p>To satisfy course presentation requirements and test interactive viability, we developed an end-to-end Gradio web application (<code>app/app.py</code>).</p>
+<h3>7.1 Architecture &amp; Features</h3>
+<ul>
+<li><strong>Curated Test Spotlights:</strong> Dropdown containing 4 representative case studies (<code>data/demo_articles.json</code>) loaded directly with verified fine-tuned predictions, ground-truth human references, and analytical commentary notes.</li>
+<li><strong>Instant Offline Reliability:</strong> Guarantees zero-latency comparison during live presentation without requiring local multi-gigabyte checkpoints or internet access.</li>
+<li><strong>Live Side-by-Side Comparison:</strong> Evaluates custom text inputs when local model checkpoints are supplied (<code>--bart-checkpoint</code>, <code>--t5-checkpoint</code>) with Apple Silicon MPS acceleration.</li>
+<li><strong>Dynamic Parameter Sliders:</strong> Real-time adjustment of <code>num_beams</code> (1 to 8), <code>min_length</code> (10 to 60), and <code>max_length</code> (50 to 200).</li>
+<li><strong>Latency &amp; Token Telemetry:</strong> Displays instantaneous generation time (in seconds) and generated token length for each model.</li>
+<li><strong>Graceful Degradation:</strong> Detects missing local checkpoints and prompts the user with informative guidance rather than crashing.</li>
+</ul>
+<hr />
+<h2>8. Limitations &amp; Threats to Validity</h2>
+<p>In adherence to scientific rigor, several limitations must be noted:</p>
+<ol>
+<li><strong>Model Scale:</strong> Due to memory constraints, experiments were conducted on base architectures (~140M–220M parameters) rather than large counterparts (~400M–770M parameters).</li>
+<li><strong>512-Token Truncation:</strong> Long articles were truncated to 512 input tokens. Summarization performance is therefore biased toward the opening sections of articles.</li>
+<li><strong>Subset Training (1 Epoch):</strong> Training on 12,000 examples for 1 epoch provides strong fine-tuning signal while fitting within compute budgets, but does not represent asymptotic model convergence.</li>
+<li><strong>Single Evaluator for Error Analysis:</strong> Qualitative error analysis was conducted by a single human annotator on 25 articles. While double-blinded, inter-annotator agreement (e.g., Cohen's Kappa) could not be calculated.</li>
+<li><strong>Metric Constraints:</strong> ROUGE scores reward lexical recall against a single human reference, occasionally penalizing valid abstractive paraphrasing.</li>
+</ol>
+<hr />
+<h2>9. Conclusion &amp; Synthesis of Research Questions</h2>
+<p>This capstone project establishes a complete, reproducible empirical pipeline comparing BART and T5 for abstractive summarization on CNN/DailyMail. By holding dataset partitions, evaluation implementations, and decoding strategies constant, our experiments yield decisive answers to the core research questions:</p>
+<ol>
+<li><strong>RQ1 (Summarization Quality):</strong> Both models achieve substantial and comparable improvements of <strong>+12.4% absolute gain in ROUGE-1</strong> over their untrained baselines. T5-base maintains a slight lead in lexical overlap (42.88% vs. 40.23% ROUGE-1, 30.12% vs. 27.06% ROUGE-L), primarily reflecting its multi-task pre-training corpus.</li>
+<li><strong>RQ2 (Information Preservation &amp; Factuality):</strong> In double-blind human evaluation, <strong>BART-base achieved higher coverage (4.24 vs. 3.88)</strong> and <strong>higher factual consistency (4.88 vs. 4.68)</strong>, demonstrating superior retention of core journalistic leads. The primary failure mode across both models was <strong>critical fact omission (<code>OM</code>)</strong> caused by length caps, while explicit hallucination (<code>EH</code>) was rare (1 occurrence in BART, 3 in T5).</li>
+<li><strong>RQ3 (Decoding Dynamics):</strong> Frozen beam search with <code>num_beams=4</code> and <code>no_repeat_ngram_size=3</code> successfully eliminated degenerate repetition loops (<code>REP = 0</code>) across both architectures, with T5 generating longer, more compound sentences (100.3 vs. 83.1 tokens).</li>
+<li><strong>RQ4 (Computational Efficiency &amp; Deployment Viability):</strong> <strong>BART-base is decisively superior for interactive web deployment</strong>, delivering <strong>1.84× faster inference latency (0.309s vs. 0.569s per article)</strong>, half the training duration (11.5 min vs. 21.9 min), and stable fp16 execution on consumer/cloud GPUs without numerical instability.</li>
+</ol>
+<p>The accompanying Gradio web application bridges rigorous academic benchmarking with an intuitive, interactive demonstration tool suitable for real-time presentation and user exploration.</p>
+<hr />
+<h2>References</h2>
+<ol>
+<li>Lewis, M., et al. (2020). <em>BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension.</em> ACL 2020.</li>
+<li>Raffel, C., et al. (2020). <em>Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer.</em> JMLR 2020.</li>
+<li>Hermann, K. M., et al. (2015). <em>Teaching Machines to Read and Comprehend.</em> NeurIPS 2015. (CNN/DailyMail Dataset).</li>
+<li>Lin, C. Y. (2004). <em>ROUGE: A Package for Automatic Evaluation of Summaries.</em> ACL Workshop.</li>
+<li>Wolf, T., et al. (2020). <em>Transformers: State-of-the-Art Natural Language Processing.</em> EMNLP 2020.</li>
+</ol>
+
+  </div>
+
+</body>
+</html>
