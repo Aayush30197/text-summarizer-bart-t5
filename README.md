@@ -1,8 +1,25 @@
 # Comparative Evaluation of BART and T5 for Abstractive Text Summarization
 
-**Course:** CSCI 390, Fisk University  
+**Course:** CSCI 390: Natural Language Processing and Applications — Fall 2026  
+**Institution:** Fisk University  
 **Instructor:** Dr. Qi Li  
+**Author:** Aayush Khanal  
 **Dataset:** CNN/DailyMail (non-anonymized `3.0.0`)  
+
+---
+
+> 👨‍🏫 **Quickstart for Instructor / Evaluator (Dr. Qi Li):**  
+> For complete grading instructions, reproduction commands, and rubric deliverables mapping, see:  
+> 👉 [**`INSTRUCTIONS_FOR_PROFESSOR.md`**](INSTRUCTIONS_FOR_PROFESSOR.md)
+>
+> **Fast Evaluation (Launch Demo Immediately):**
+> ```bash
+> pip install -r requirements.txt
+> python app/app.py
+> ```
+> * **Interactive Gradio Demo:** Open `http://127.0.0.1:7860` (or `8080`)
+> * **Presentation Slide Deck:** Open [`report/slides.html`](report/slides.html) in your browser
+> * **Academic Technical Report:** Open [`report/report.html`](report/report.html) or [`report/report.md`](report/report.md)
 
 ---
 

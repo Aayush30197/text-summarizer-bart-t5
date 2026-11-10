@@ -349,7 +349,7 @@
     <!-- SLIDE 1: What is Summarization? -->
     <section class="slide active" data-slide="1" data-notes="Good morning everyone! For my senior capstone project, I looked at a question we all care about: Can AI read a massive news article and give us a short, accurate summary in its own words? In NLP, there are two ways to summarize: Extractive is like taking a yellow highlighter and copying sentences directly from the text. Abstractive—which is what humans do—means reading the story, understanding the main events, and rephrasing it in your own words. That's what we are building and comparing today using two popular AI models: BART and T5.">
       <div class="slide-header">
-        <span class="tag">SLIDE 1 OF 10 • THE BIG PICTURE</span>
+        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION (5 MIN) • SLIDE 1 OF 10</span>
         <h2>Teaching Computers to Summarize News: BART vs. T5</h2>
       </div>
       <div class="slide-body">
@@ -390,7 +390,7 @@
     <!-- SLIDE 2: Why is this hard? -->
     <section class="slide" data-slide="2" data-notes="Why is abstractive summarization so hard? Because language models are basically powerful sentence completers. They don't have a concept of truth. That creates three major risks: 1. Hallucinations: The AI invents fake names, wrong dates, or claims someone did something they never did. 2. Missing the punchline: The AI talks about boring background details and cuts off before telling you how the story ended. 3. Repetition loops: The AI gets stuck repeating the exact same phrase over and over. So our research questions test: When we train two different AI models under the exact same conditions, which one makes fewer mistakes, and which one runs faster?">
       <div class="slide-header">
-        <span class="tag">SLIDE 2 OF 10 • THE CHALLENGE</span>
+        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION (5 MIN) • SLIDE 2 OF 10</span>
         <h2>Why is Summarization So Hard for AI?</h2>
       </div>
       <div class="slide-body">
@@ -431,7 +431,7 @@
     <!-- SLIDE 3: Meet the Contenders: BART vs T5 -->
     <section class="slide" data-slide="3" data-notes="Let's introduce our two AI models: BART and T5. Think of BART like a smart proofreader. During its initial training, scientists took sentences, erased words, and scrambled paragraphs, and asked BART: 'Can you reconstruct the original clean text?' This makes BART fantastic at editing and condensing messy text. T5, on the other hand, was built by Google as a universal Swiss Army knife for text. It was trained to do everything—translation, question answering, math—using plain English instructions. To make T5 summarize, you literally have to feed it the words: 'summarize: ' followed by the article. BART has 140 million parameters, while T5 is bigger with 220 million parameters.">
       <div class="slide-header">
-        <span class="tag">SLIDE 3 OF 10 • THE TWO MODELS</span>
+        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION (5 MIN) • SLIDE 3 OF 10</span>
         <h2>Meet the Contenders: BART vs. T5</h2>
       </div>
       <div class="slide-body">
@@ -468,8 +468,8 @@
     <!-- SLIDE 4: How Did I Train Them? -->
     <section class="slide" data-slide="4" data-notes="To make this a completely fair competition, I couldn't just give one model an easier test or different data. I used the CNN and DailyMail dataset—which consists of real news articles written by journalists, paired with bullet-point summary highlights. I sampled 12,000 training articles and 1,000 test articles using a locked random seed so there is zero cheating or data leakage. I also cut every article at 512 words. In journalism, there's a famous concept called the 'inverted pyramid': reporters put the most important who, what, where, and when in the first three paragraphs. So cutting at 512 words saves huge amounts of computer memory while keeping 90% of the key facts. Both models were trained on a cloud GPU under identical training rules.">
       <div class="slide-header">
-        <span class="tag">SLIDE 4 OF 10 • THE EXPERIMENTAL PIPELINE</span>
-        <h2>How Did I Train & Test Them Fairly?</h2>
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS (5 MIN) • SLIDE 4 OF 10</span>
+        <h2>How Did I Train &amp; Test Them Fairly?</h2>
       </div>
       <div class="slide-body">
         <div class="grid-3" style="margin-bottom: 20px;">
@@ -510,7 +510,7 @@
     <!-- SLIDE 5: What is ROUGE? -->
     <section class="slide" data-slide="5" data-notes="Now, how do computer scientists grade an AI summary? In NLP, we use a standard metric called ROUGE. Don't let the fancy name scare you: ROUGE is just a word-matching game. It compares the AI's summary against the human journalist's summary. ROUGE-1 asks: What percentage of individual words matched? ROUGE-2 asks: What percentage of 2-word phrases like 'White House' or 'world champion' matched? And ROUGE-L checks the longest uninterrupted sequence of matching words. If the AI gets a ROUGE score around 40%, in the world of NLP news summarization, that is considered a strong, human-grade score!">
       <div class="slide-header">
-        <span class="tag">SLIDE 5 OF 10 • HOW DO WE GRADE AI?</span>
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS (5 MIN) • SLIDE 5 OF 10</span>
         <h2>How Do We Grade AI Summaries? (What is ROUGE?)</h2>
       </div>
       <div class="slide-body">
@@ -558,7 +558,7 @@
     <!-- SLIDE 6: Results -->
     <section class="slide" data-slide="6" data-notes="Here are our quantitative findings on 1,000 brand new test articles. First, both models improved dramatically after training: their ROUGE scores jumped by +12.4 percentage points. If we look strictly at the ROUGE numbers, T5 wins: it scored 42.8% on ROUGE-1 compared to BART's 40.2%. But look at the right side of the table: BART generated its summaries in 0.31 seconds per article—almost TWICE as fast as T5 (0.57 seconds). And during training, BART finished in 11 minutes while T5 took 22 minutes. Also, BART wrote tighter, punchier summaries averaging 83 words, while T5 wrote longer 100-word summaries.">
       <div class="slide-header">
-        <span class="tag">SLIDE 6 OF 10 • THE BENCHMARK RESULTS</span>
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS (5 MIN) • SLIDE 6 OF 10</span>
         <h2>The Showdown: Benchmark Results on 1,000 Articles</h2>
       </div>
       <div class="slide-body">
@@ -621,7 +621,7 @@
     <!-- SLIDE 7: Double-Blind Human Test -->
     <section class="slide" data-slide="7" data-notes="Because ROUGE doesn't understand facts, I conducted a double-blind human test on 25 articles. 'Double-blind' means I anonymized the summaries into 'Summary A' and 'Summary B' with the model names locked in a secret key file so I couldn't be biased. I rated every summary from 1 to 5 stars on four simple questions: 1. Did it capture the main news event? 2. Were the facts completely true? 3. Did it read fluently? 4. Was it concise? When I unlocked the key file, the results were fascinating: BART actually BEAT T5 in factual grounding (4.88 out of 5 vs 4.68) and main event coverage (4.24 vs 3.88)! The most common mistake for both models was omitting later details because of the length limit. But T5 had 3 hallucinations compared to only 1 for BART.">
       <div class="slide-header">
-        <span class="tag">SLIDE 7 OF 10 • CHECKING WITH HUMAN EYES</span>
+        <span class="tag">SECTION 3.3: ERRORS &amp; DEBUGGING CHALLENGES (5 MIN) • SLIDE 7 OF 10</span>
         <h2>Why Numbers Lie: My Double-Blind Human Study</h2>
       </div>
       <div class="slide-body">
@@ -716,7 +716,7 @@
     <!-- SLIDE 8: The Live Demo & Real Mistakes -->
     <section class="slide" data-slide="8" data-notes="Now let's look at real examples in our live interactive Gradio demo. I've highlighted three real cases that show how each model can fail: In Case 1, a story about a girl detained at Cape Town airport in South Africa, BART randomly hallucinated a headline about a 'Virginia teen recruiter'—something it remembered from its pre-training memory! Here, T5 stayed 100% truthful. In Case 2, an English Premier League soccer match, Crystal Palace was hosting Manchester City. T5 hallucinated that the match was at 'the Emirates'—which is Arsenal's stadium! BART got the venue completely right. And in Case 3, a tragic police shooting, BART successfully reported the second-degree manslaughter charge, while T5 only talked about paperwork. Let's switch to the live app to see it!">
       <div class="slide-header">
-        <span class="tag">SLIDE 8 OF 10 • REAL AI MISTAKES</span>
+        <span class="tag">SECTION 3.4: LIVE INTERACTIVE DEMO (10 MIN) • SLIDE 8 OF 10</span>
         <h2>Seeing is Believing: Real AI Mistakes in Our Demo</h2>
       </div>
       <div class="slide-body">
@@ -767,7 +767,7 @@
     <!-- SLIDE 9: Limitations -->
     <section class="slide" data-slide="9" data-notes="As in any good engineering project, it's important to be honest about our limitations: 1. We trained for 1 epoch on 12,000 articles because cloud GPU hours are limited on a student budget. Given more time and compute, training for 3 to 5 epochs would boost accuracy even further. 2. Cutting articles at 512 words means if an investigative piece only reveals the culprit at the very end of page 5, our model won't see it. 3. My human study had 25 articles evaluated by one person. In a major corporate research lab, you'd hire multiple annotators and measure their agreement. 4. Most importantly: AI summaries are assistants, not replacements for human judgment. Critical legal, medical, or financial facts should always be checked against the original document!">
       <div class="slide-header">
-        <span class="tag">SLIDE 9 OF 10 • SCIENTIFIC HONESTY</span>
+        <span class="tag">SECTION 3.3: ERRORS &amp; LIMITATIONS (5 MIN) • SLIDE 9 OF 10</span>
         <h2>Limitations: What Would We Do With More Compute?</h2>
       </div>
       <div class="slide-body">
@@ -806,7 +806,7 @@
     <!-- SLIDE 10: Conclusion & When to choose which -->
     <section class="slide" data-slide="10" data-notes="To wrap everything up: Both models did a fantastic job learning how to summarize news articles from scratch, achieving professional-grade ROUGE scores above 40%. If you ever need to pick between them for an NLP project: Choose BART if you care about speed, low cost, and crisp factual summaries. It runs nearly twice as fast and trains in half the time. Choose T5 if your priority is longer, flowing prose and complex grammar. Thank you Dr. Li, thank you classmates, and I would love to answer any questions or try any news article in the live demo!">
       <div class="slide-header">
-        <span class="tag">SLIDE 10 OF 10 • THE FINAL VERDICT</span>
+        <span class="tag">SECTION 3.5: Q&amp;A &amp; CONCLUSION (5 MIN) • SLIDE 10 OF 10</span>
         <h2>Summary: Which Model Should You Choose?</h2>
       </div>
       <div class="slide-body">
