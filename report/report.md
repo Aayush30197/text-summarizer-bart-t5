@@ -114,10 +114,29 @@ Both models were fine-tuned for 1.0 epoch (188 optimizer steps at effective batc
 | **BART-base** | 188 steps (1 epoch) | 2.4891 | 1.8937 | **40.23%** | **17.71%** | **27.06%** | **37.01%** | **0.309s** (±0.060s) | 83.1 | 1,878 MB |
 | **T5-base** | 188 steps (1 epoch) | 1.6706 | 1.5300 | **42.88%** | **20.24%** | **30.12%** | **36.67%** | **0.569s** (±0.140s) | 100.3 | 1,898 MB |
 
-### 4.3 Baseline vs. Fine-Tuning Gain Analysis
-* **BART-base:** Increased ROUGE-1 from 27.87% to 40.23% (**+12.36% absolute gain**), ROUGE-2 from 9.95% to 17.71% (**+7.76% gain**), and ROUGE-L from 17.70% to 27.06% (**+9.36% gain**).
-* **T5-base:** Increased ROUGE-1 from 30.43% to 42.88% (**+12.45% absolute gain**), ROUGE-2 from 10.40% to 20.24% (**+9.84% gain**), and ROUGE-L from 21.55% to 30.12% (**+8.57% gain**).
-* **Synthesis:** Both models exhibit remarkably comparable fine-tuning leaps (~12.4% gain in ROUGE-1). T5-base maintains a slight lead of ~2.6 ROUGE points in overall overlap, largely inherited from its initial pre-training advantage.
+### 4.3 Head-to-Head Comparison: Before vs. After Fine-Tuning
+
+To evaluate how much each model benefited from fine-tuning on the 12,000 CNN/DailyMail training articles, Table 3 directly pairs the zero-shot baseline metrics against the final fine-tuned checkpoints:
+
+**Table 3: Comprehensive Model Comparison Before and After Fine-Tuning**
+
+| Model Architecture | Metric | Before Fine-Tuning (Pre-Trained Zero-Shot) | After Fine-Tuning (12,000 Articles, 1 Epoch) | Net Absolute Improvement ($\Delta$) | Relative Percentage Gain |
+|---|---|:---:|:---:|:---:|:---:|
+| **BART-base** (~140M) | **ROUGE-1** | 27.87% | **40.23%** | **+12.36%** | **+44.3%** |
+| | **ROUGE-2** | 9.95% | **17.71%** | **+7.76%** | **+78.0%** |
+| | **ROUGE-L** | 17.70% | **27.06%** | **+9.36%** | **+52.9%** |
+| | **ROUGE-Lsum** | 21.27% | **37.01%** | **+15.74%** | **+74.0%** |
+| | **Inference Latency** | 0.352s / article | **0.309s / article** | −0.043s | **1.84× Faster than T5** |
+| **T5-base** (~220M) | **ROUGE-1** | 30.43% | **42.88%** | **+12.45%** | **+40.9%** |
+| | **ROUGE-2** | 10.40% | **20.24%** | **+9.84%** | **+94.6%** |
+| | **ROUGE-L** | 21.55% | **30.12%** | **+8.57%** | **+39.8%** |
+| | **ROUGE-Lsum** | 24.57% | **36.67%** | **+12.10%** | **+49.2%** |
+| | **Inference Latency** | 0.612s / article | **0.569s / article** | −0.043s | Baseline Latency |
+
+### 4.4 Synthesis of Comparative Findings
+1. **Identical Fine-Tuning Trajectory:** Both architectures extracted virtually identical learning gains from the 12,000-article dataset: BART improved by **+12.36 points** in ROUGE-1, while T5 improved by **+12.45 points**. This demonstrates that under identical hyperparameters, learning rates, and batch dynamics, neither model architecture is inherently "faster at learning" summarization; both adapt at nearly identical rates.
+2. **Pre-Training Heritage vs. Fine-Tuning Lead:** T5-base's final advantage in ROUGE-1 (42.88% vs 40.23%, a 2.65-point margin) directly tracks its starting zero-shot advantage (30.43% vs 27.87%, a 2.56-point margin). Because T5's pre-training on C4 already exposed the model to multi-task sentence generation, it began the experiment with an inherent head start.
+3. **Efficiency Divergence:** While T5 achieves higher lexical overlap, BART-base decisively wins in computational throughput: generating summaries in **0.309s per article (1.84× faster)** and training in **11.5 minutes vs. 21.9 minutes** for T5.
 
 ---
 

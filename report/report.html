@@ -477,12 +477,109 @@ T5-base demonstrates a noticeable advantage in zero-shot ROUGE scores prior to f
 </tr>
 </tbody>
 </table>
-<h3>4.3 Baseline vs. Fine-Tuning Gain Analysis</h3>
-<ul>
-<li><strong>BART-base:</strong> Increased ROUGE-1 from 27.87% to 40.23% (<strong>+12.36% absolute gain</strong>), ROUGE-2 from 9.95% to 17.71% (<strong>+7.76% gain</strong>), and ROUGE-L from 17.70% to 27.06% (<strong>+9.36% gain</strong>).</li>
-<li><strong>T5-base:</strong> Increased ROUGE-1 from 30.43% to 42.88% (<strong>+12.45% absolute gain</strong>), ROUGE-2 from 10.40% to 20.24% (<strong>+9.84% gain</strong>), and ROUGE-L from 21.55% to 30.12% (<strong>+8.57% gain</strong>).</li>
-<li><strong>Synthesis:</strong> Both models exhibit remarkably comparable fine-tuning leaps (~12.4% gain in ROUGE-1). T5-base maintains a slight lead of ~2.6 ROUGE points in overall overlap, largely inherited from its initial pre-training advantage.</li>
-</ul>
+<h3>4.3 Head-to-Head Comparison: Before vs. After Fine-Tuning</h3>
+<p>To evaluate how much each model benefited from fine-tuning on the 12,000 CNN/DailyMail training articles, Table 3 directly pairs the zero-shot baseline metrics against the final fine-tuned checkpoints:</p>
+<p><strong>Table 3: Comprehensive Model Comparison Before and After Fine-Tuning</strong></p>
+<table>
+<thead>
+<tr>
+<th>Model Architecture</th>
+<th>Metric</th>
+<th style="text-align:center">Before Fine-Tuning (Pre-Trained Zero-Shot)</th>
+<th style="text-align:center">After Fine-Tuning (12,000 Articles, 1 Epoch)</th>
+<th style="text-align:center">Net Absolute Improvement ($\Delta$)</th>
+<th style="text-align:center">Relative Percentage Gain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BART-base</strong> (~140M)</td>
+<td><strong>ROUGE-1</strong></td>
+<td style="text-align:center">27.87%</td>
+<td style="text-align:center"><strong>40.23%</strong></td>
+<td style="text-align:center"><strong>+12.36%</strong></td>
+<td style="text-align:center"><strong>+44.3%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>ROUGE-2</strong></td>
+<td style="text-align:center">9.95%</td>
+<td style="text-align:center"><strong>17.71%</strong></td>
+<td style="text-align:center"><strong>+7.76%</strong></td>
+<td style="text-align:center"><strong>+78.0%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>ROUGE-L</strong></td>
+<td style="text-align:center">17.70%</td>
+<td style="text-align:center"><strong>27.06%</strong></td>
+<td style="text-align:center"><strong>+9.36%</strong></td>
+<td style="text-align:center"><strong>+52.9%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>ROUGE-Lsum</strong></td>
+<td style="text-align:center">21.27%</td>
+<td style="text-align:center"><strong>37.01%</strong></td>
+<td style="text-align:center"><strong>+15.74%</strong></td>
+<td style="text-align:center"><strong>+74.0%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Inference Latency</strong></td>
+<td style="text-align:center">0.352s / article</td>
+<td style="text-align:center"><strong>0.309s / article</strong></td>
+<td style="text-align:center">−0.043s</td>
+<td style="text-align:center"><strong>1.84× Faster than T5</strong></td>
+</tr>
+<tr>
+<td><strong>T5-base</strong> (~220M)</td>
+<td><strong>ROUGE-1</strong></td>
+<td style="text-align:center">30.43%</td>
+<td style="text-align:center"><strong>42.88%</strong></td>
+<td style="text-align:center"><strong>+12.45%</strong></td>
+<td style="text-align:center"><strong>+40.9%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>ROUGE-2</strong></td>
+<td style="text-align:center">10.40%</td>
+<td style="text-align:center"><strong>20.24%</strong></td>
+<td style="text-align:center"><strong>+9.84%</strong></td>
+<td style="text-align:center"><strong>+94.6%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>ROUGE-L</strong></td>
+<td style="text-align:center">21.55%</td>
+<td style="text-align:center"><strong>30.12%</strong></td>
+<td style="text-align:center"><strong>+8.57%</strong></td>
+<td style="text-align:center"><strong>+39.8%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>ROUGE-Lsum</strong></td>
+<td style="text-align:center">24.57%</td>
+<td style="text-align:center"><strong>36.67%</strong></td>
+<td style="text-align:center"><strong>+12.10%</strong></td>
+<td style="text-align:center"><strong>+49.2%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Inference Latency</strong></td>
+<td style="text-align:center">0.612s / article</td>
+<td style="text-align:center"><strong>0.569s / article</strong></td>
+<td style="text-align:center">−0.043s</td>
+<td style="text-align:center">Baseline Latency</td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Synthesis of Comparative Findings</h3>
+<ol>
+<li><strong>Identical Fine-Tuning Trajectory:</strong> Both architectures extracted virtually identical learning gains from the 12,000-article dataset: BART improved by <strong>+12.36 points</strong> in ROUGE-1, while T5 improved by <strong>+12.45 points</strong>. This demonstrates that under identical hyperparameters, learning rates, and batch dynamics, neither model architecture is inherently &quot;faster at learning&quot; summarization; both adapt at nearly identical rates.</li>
+<li><strong>Pre-Training Heritage vs. Fine-Tuning Lead:</strong> T5-base's final advantage in ROUGE-1 (42.88% vs 40.23%, a 2.65-point margin) directly tracks its starting zero-shot advantage (30.43% vs 27.87%, a 2.56-point margin). Because T5's pre-training on C4 already exposed the model to multi-task sentence generation, it began the experiment with an inherent head start.</li>
+<li><strong>Efficiency Divergence:</strong> While T5 achieves higher lexical overlap, BART-base decisively wins in computational throughput: generating summaries in <strong>0.309s per article (1.84× faster)</strong> and training in <strong>11.5 minutes vs. 21.9 minutes</strong> for T5.</li>
+</ol>
 <hr />
 <h2>5. Computational Efficiency &amp; Hardware Profiling</h2>
 <p>To answer <strong>RQ4</strong>, efficiency was benchmarked on NVIDIA Tesla T4 (16 GB VRAM, CUDA 13.0):</p>
