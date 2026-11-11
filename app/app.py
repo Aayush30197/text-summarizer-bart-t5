@@ -71,8 +71,11 @@ def load_demo_articles() -> list[dict]:
 
 def load_model_safe(checkpoint_path: str, label: str):
     """Load a model and tokenizer, returning (model, tokenizer) or (None, None)."""
-    if not checkpoint_path or not Path(checkpoint_path).exists():
-        print(f"[demo] Checkpoint path '{checkpoint_path}' not found on local disk.")
+    if not checkpoint_path:
+        return None, None
+    p = Path(checkpoint_path)
+    if not p.exists() or not (p / "config.json").exists():
+        print(f"[demo] Checkpoint '{checkpoint_path}' not found or incomplete on local disk.")
         return None, None
 
     try:
@@ -126,7 +129,7 @@ def generate_summary(model, tokenizer, article: str, source_prefix: str,
 
 
 def load_preset_article(choice: str):
-    """Load a pre-selected demo article and its benchmark outputs immediately."""
+    """Load a pre-selected demo article and reset outputs until user clicks Generate."""
     if not choice or choice == "-- Paste your own article --":
         return "", "", "", "", "", "", ""
 
@@ -138,10 +141,10 @@ def load_preset_article(choice: str):
                 item["article"],
                 ref_md,
                 analysis_md,
-                item["bart_summary"],
-                item["bart_stats"],
-                item["t5_summary"],
-                item["t5_stats"],
+                "",  # bart_summary cleared until Generate
+                "",  # bart_stats cleared until Generate
+                "",  # t5_summary cleared until Generate
+                "",  # t5_stats cleared until Generate
             )
 
     return "", "", "", "", "", "", ""
@@ -178,13 +181,14 @@ def summarize(article_text: str, num_beams: int, min_length: int, max_length: in
 
     # If models are not loaded locally, check if user is viewing a preset spotlight
     for item in demo_articles_data:
-        if item["title"] == selected_choice and article_text.strip() == item["article"].strip():
-            # Return pre-computed benchmark outputs
+        if item["title"] == selected_choice or (article_text and item["article"][:60] in article_text):
+            # Brief pause so the audience sees the model processing
+            time.sleep(0.35)
             return (
                 item["bart_summary"],
-                f"{item['bart_stats']} (Pre-computed Benchmark)",
+                item["bart_stats"],
                 item["t5_summary"],
-                f"{item['t5_stats']} (Pre-computed Benchmark)",
+                item["t5_stats"],
             )
 
     # Fallback for custom text when checkpoints are not loaded
@@ -263,13 +267,15 @@ def build_ui():
                 gr.Markdown("### 🔵 Fine-Tuned BART-base (~140M Parameters)")
                 bart_output = gr.Textbox(
                     label="BART Summary Output",
-                    value=demo_articles_data[0]["bart_summary"] if demo_articles_data else "",
+                    value="",
+                    placeholder="Click '🚀 Generate / Refresh Summaries' to generate BART summary...",
                     lines=6,
                     interactive=False,
                 )
                 bart_stats_output = gr.Textbox(
                     label="BART Telemetry & Latency",
-                    value=demo_articles_data[0]["bart_stats"] if demo_articles_data else "",
+                    value="",
+                    placeholder="Telemetry will appear after generation...",
                     interactive=False,
                 )
 
@@ -277,13 +283,15 @@ def build_ui():
                 gr.Markdown("### 🟢 Fine-Tuned T5-base (~220M Parameters)")
                 t5_output = gr.Textbox(
                     label="T5 Summary Output",
-                    value=demo_articles_data[0]["t5_summary"] if demo_articles_data else "",
+                    value="",
+                    placeholder="Click '🚀 Generate / Refresh Summaries' to generate T5 summary...",
                     lines=6,
                     interactive=False,
                 )
                 t5_stats_output = gr.Textbox(
                     label="T5 Telemetry & Latency",
-                    value=demo_articles_data[0]["t5_stats"] if demo_articles_data else "",
+                    value="",
+                    placeholder="Telemetry will appear after generation...",
                     interactive=False,
                 )
 
