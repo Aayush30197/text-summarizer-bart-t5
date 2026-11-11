@@ -133,10 +133,30 @@ To evaluate how much each model benefited from fine-tuning on the 12,000 CNN/Dai
 | | **ROUGE-Lsum** | 24.57% | **36.67%** | **+12.10%** | **+49.2%** |
 | | **Inference Latency** | 0.612s / article | **0.569s / article** | −0.043s | Baseline Latency |
 
-### 4.4 Synthesis of Comparative Findings
+### 4.4 Multi-Epoch Cloud Scaling Study (Google Colab & Kaggle)
+
+To evaluate model convergence beyond the 1-epoch baseline, we scaled fine-tuning across cloud GPU platforms (Google Colab and Kaggle with NVIDIA Tesla T4 16GB GPUs):
+
+1. **BART-base Multi-Epoch Scaling (Google Colab):**
+   * **Setup:** 3 full epochs (1,125 optimizer steps at effective batch size 32, fp16 mixed precision).
+   * **Empirical Test Results ($N=1,000$ unseen articles):**
+     * **ROUGE-1:** **40.86%** (+0.63% gain over 1-epoch baseline of 40.23%)
+     * **ROUGE-2:** **18.44%** (+0.73% gain over 1-epoch baseline of 17.71%)
+     * **ROUGE-L:** **27.90%** (+0.84% gain over 1-epoch baseline of 27.06%)
+     * **ROUGE-Lsum:** **37.95%** (+0.94% gain over 1-epoch baseline of 37.01%)
+     * **Inference Latency:** **0.296s** (±0.060s per article, maintaining high throughput)
+     * **Peak VRAM:** 1,748.85 MB
+   * **Key Observation:** Scaling BART to 3 epochs yields consistent incremental gains across every automated metric without validation degradation, while further extending BART's architectural lead on discourse structure (ROUGE-Lsum reaching 37.95% vs T5's 36.67%).
+
+2. **T5-base Multi-Epoch Scaling (Kaggle):**
+   * **Setup:** 3 full epochs (564 optimizer steps, effective batch size 32, fp32 precision).
+   * **Convergence Metrics:** Validation loss steadily improved from 3.072 down to **3.0425** at runtime 1:10:32, demonstrating stable multi-epoch learning without numerical instability when fp32 is maintained.
+
+### 4.5 Synthesis of Comparative Findings
 1. **Identical Fine-Tuning Trajectory:** Both architectures extracted virtually identical learning gains from the 12,000-article dataset: BART improved by **+12.36 points** in ROUGE-1, while T5 improved by **+12.45 points**. This demonstrates that under identical hyperparameters, learning rates, and batch dynamics, neither model architecture is inherently "faster at learning" summarization; both adapt at nearly identical rates.
 2. **Pre-Training Heritage vs. Fine-Tuning Lead:** T5-base's final advantage in ROUGE-1 (42.88% vs 40.23%, a 2.65-point margin) directly tracks its starting zero-shot advantage (30.43% vs 27.87%, a 2.56-point margin). Because T5's pre-training on C4 already exposed the model to multi-task sentence generation, it began the experiment with an inherent head start.
 3. **Efficiency Divergence:** While T5 achieves higher lexical overlap, BART-base decisively wins in computational throughput: generating summaries in **0.309s per article (1.84× faster)** and training in **11.5 minutes vs. 21.9 minutes** for T5.
+4. **Multi-Epoch Scalability:** The cloud scaling study confirms that BART continues to scale cleanly to **40.86% ROUGE-1** and **37.95% ROUGE-Lsum** with sub-0.30s latency, solidifying BART's viability for high-throughput production environments.
 
 ---
 

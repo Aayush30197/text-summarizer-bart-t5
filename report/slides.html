@@ -974,7 +974,7 @@ First, training was a massive success: both models leaped by +12.4 percentage po
 If you look strictly at the ROUGE leaderboard, T5 won the numbers game: it reached 42.88% ROUGE-1 compared to BART's 40.23%, and 20.24% on ROUGE-2.
 However, look at ROUGE-Lsum: BART beat T5 with 37.01% versus 36.67%!
 This proves that BART structures sentence boundaries better for multi-sentence news summaries.
-Both models gained over 40% relative improvement from baseline, demonstrating that fine-tuning was effective.">
+Furthermore, in our 3-epoch cloud scaling study on Google Colab, BART climbed further to 40.86% ROUGE-1 and 37.95% ROUGE-Lsum, proving steady scaling gains with ultra-fast 0.296s latency.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT IV // SCENE 02: THE SCOREBOARD</span>
@@ -1046,7 +1046,24 @@ Both models gained over 40% relative improvement from baseline, demonstrating th
           </tbody>
         </table>
 
-        <div class="grid-3" style="margin-top: 10px;">
+        <!-- Multi-Epoch Cloud Scaling Highlight -->
+        <div style="margin-top: 8px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 9px 14px; display: flex; justify-content: space-between; align-items: center; gap: 14px;">
+          <div>
+            <div style="font-size: 0.74rem; font-family: var(--font-mono); color: var(--indie-cyan); font-weight: 800; text-transform: uppercase;">
+              ☁️ Cloud Scaling Extension: 3-Epoch Verification (Google Colab &amp; Kaggle T4 GPUs)
+            </div>
+            <div style="font-size: 0.81rem; color: #cbd5e1; margin-top: 2px;">
+              Scaling BART to <strong>3 epochs</strong> further boosted metrics: <strong>ROUGE-1: 40.86%</strong> (+0.63%), <strong>ROUGE-2: 18.44%</strong> (+0.73%), <strong>ROUGE-Lsum: 37.95%</strong> (+0.94%), with sub-0.30s latency (<strong>0.296s</strong>). T5 3-epoch validation loss converged to <strong>3.04</strong>.
+            </div>
+          </div>
+          <div style="background: rgba(12, 16, 23, 0.85); border: 1px solid var(--film-border); border-radius: 6px; padding: 6px 12px; text-align: center; min-width: 140px;">
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);">BART 3-EPOCH R-1</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--indie-cyan);">40.86%</div>
+            <div style="font-size: 0.68rem; color: var(--indie-emerald); font-family: var(--font-mono);">0.296s latency</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 8px;">
           <div class="film-card bart">
             <strong style="color: var(--indie-cyan); font-size: 0.88rem;">Finding 1: Massive Jumps</strong>
             <p style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">Both models gained over +12 ROUGE points in a single epoch.</p>
@@ -1057,7 +1074,7 @@ Both models gained over 40% relative improvement from baseline, demonstrating th
           </div>
           <div class="film-card purple">
             <strong style="color: var(--indie-purple); font-size: 0.88rem;">Finding 3: BART Wins Structure</strong>
-            <p style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">BART won ROUGE-Lsum (37.01% vs 36.67%), proving tighter sentence boundaries.</p>
+            <p style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">BART won ROUGE-Lsum (37.01% -> 37.95% at 3 ep), proving tighter sentence boundaries.</p>
           </div>
         </div>
       </div>
@@ -1506,6 +1523,7 @@ Thank you Dr. Li, thank you classmates, and I'd be happy to take any questions o
     <!-- SLIDE 15: QUICK REVISION — The Memory Vault -->
     <section class="slide" data-slide="15" data-notes="This final slide is your quick memory vault. Every single number from our project is summarized here in one place:
 - BART: 140 million parameters, fp16, 6 layers, 11m 30s training, 0.309s latency, 40.23% R-1, 37.01% R-Lsum, 4.88 factuality.
+- BART 3-Epoch (Colab): 40.86% R-1, 18.44% R-2, 37.95% R-Lsum, 0.296s latency.
 - T5: 220 million parameters (+57%), fp32, 12 layers, 21m 52s training, 0.569s latency, 42.88% R-1, 36.67% R-Lsum, 4.68 factuality.
 - Dataset: CNN/DailyMail 3.0.0, 12k train / 1k val / 1k test, Seed 42, 512 input tokens, 128 max output tokens, batch size 32, beam size 4, 3-gram blocking.
 You have the complete facts and figures at your fingertips!">
@@ -1549,10 +1567,11 @@ You have the complete facts and figures at your fingertips!">
             </thead>
             <tbody>
               <tr><td>Baseline ROUGE-1 (Pretrained)</td><td>27.87%</td><td class="highlight-t5">30.43%</td></tr>
-              <tr><td>Final ROUGE-1 (Fine-Tuned)</td><td>40.23%</td><td class="highlight-t5">42.88% (Winner)</td></tr>
-              <tr><td>Final ROUGE-2</td><td>17.71%</td><td class="highlight-t5">20.24% (Winner)</td></tr>
-              <tr><td>Final ROUGE-Lsum</td><td class="highlight-bart">37.01% (Winner)</td><td>36.67%</td></tr>
-              <tr><td>Inference Latency</td><td class="highlight-bart">0.309s (1.84× Faster)</td><td>0.569s</td></tr>
+              <tr><td>Final ROUGE-1 (Fine-Tuned 1-Ep)</td><td>40.23%</td><td class="highlight-t5">42.88% (Winner)</td></tr>
+              <tr><td>Final ROUGE-2 (1-Ep)</td><td>17.71%</td><td class="highlight-t5">20.24% (Winner)</td></tr>
+              <tr><td>Final ROUGE-Lsum (1-Ep)</td><td class="highlight-bart">37.01% (Winner)</td><td>36.67%</td></tr>
+              <tr><td>3-Epoch Scaling R-1 / R-Lsum</td><td class="highlight-bart"><strong>40.86% / 37.95%</strong> (Colab)</td><td>T5 val loss: 3.04 (Kaggle)</td></tr>
+              <tr><td>Inference Latency</td><td class="highlight-bart">0.309s (0.296s at 3-ep)</td><td>0.569s</td></tr>
               <tr><td>Training Duration</td><td class="highlight-bart">11m 30s (17.38 samples/s)</td><td>21m 52s (9.14 samples/s)</td></tr>
               <tr><td>Numerical Precision</td><td>fp16 Mixed Precision</td><td>fp32 Full Precision</td></tr>
               <tr><td>Event Coverage (Human)</td><td class="highlight-bart">4.24 / 5.0 (Winner)</td><td>3.88 / 5.0</td></tr>

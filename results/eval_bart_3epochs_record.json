@@ -1,0 +1,38 @@
+{
+  "experiment": "eval_bart_3epochs",
+  "mode": "full",
+  "model_name": "facebook/bart-base",
+  "checkpoint": "checkpoints/bart-base-3epochs",
+  "num_test_examples": 1000,
+  "epochs": 3,
+  "source_prefix": "",
+  "decoding_config": {
+    "num_beams": 4,
+    "max_length": 128,
+    "min_length": 30,
+    "length_penalty": 2.0,
+    "no_repeat_ngram_size": 3,
+    "early_stopping": true
+  },
+  "rouge_scores": {
+    "rouge1": 0.40861073402674003,
+    "rouge2": 0.18436126044286955,
+    "rougeL": 0.2790300361740484,
+    "rougeLsum": 0.379456747932592
+  },
+  "efficiency": {
+    "mean_latency_seconds": 0.29572430189999804,
+    "std_latency_seconds": 0.05990308031033291,
+    "latency_sample_size": 100,
+    "warmup_skipped": 5,
+    "mean_generated_length_tokens": 86.765,
+    "peak_memory_mb": 1748.84765625
+  },
+  "hardware": {
+    "device": "cuda",
+    "gpu": "NVIDIA Tesla T4 (16 GB)",
+    "fp16": true,
+    "platform": "Google Colab"
+  },
+  "seed": 42
+}
