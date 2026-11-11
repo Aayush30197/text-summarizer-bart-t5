@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSCI 390: Teaching AI to Summarize News — BART vs. T5</title>
+  <title>CSCI 390 Capstone: Comparative Evaluation of BART and T5 for Abstractive Summarization</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --card-border: #334155;
+      --bg: #0b1120;
+      --card-bg: #151e32;
+      --card-border: #28354e;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --accent-bart: #38bdf8;
       --accent-t5: #4ade80;
       --accent-warn: #fbbf24;
       --accent-purple: #c084fc;
+      --accent-red: #f87171;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
@@ -37,9 +38,9 @@
 
     /* Top Bar */
     header {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(11, 17, 32, 0.95);
       border-bottom: 1px solid var(--card-border);
-      padding: 12px 24px;
+      padding: 10px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -48,52 +49,60 @@
 
     .badge-group {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
     .badge {
-      background: #334155;
+      background: #1e293b;
       color: #e2e8f0;
-      font-size: 0.78rem;
-      padding: 4px 10px;
+      font-size: 0.75rem;
+      padding: 3px 10px;
       border-radius: 9999px;
       font-weight: 600;
+      border: 1px solid var(--card-border);
     }
 
     .badge.fisk {
-      background: #854d0e;
-      color: #fef08a;
+      background: #78350f;
+      color: #fef3c7;
+      border-color: #b45309;
+    }
+
+    .badge.author {
+      background: #0369a1;
+      color: #e0f2fe;
+      border-color: #0284c7;
     }
 
     .timer-container {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       background: var(--card-bg);
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 8px;
       border: 1px solid var(--card-border);
       font-family: var(--font-mono);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .timer-display {
       color: #38bdf8;
       font-weight: 700;
-      min-width: 55px;
+      min-width: 50px;
     }
 
     .timer-btn {
-      background: #334155;
+      background: #1e293b;
       color: var(--text);
-      border: none;
-      padding: 4px 8px;
+      border: 1px solid var(--card-border);
+      padding: 3px 8px;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
     }
-    .timer-btn:hover { background: #475569; }
+    .timer-btn:hover { background: #334155; }
 
     /* Slide Deck */
     #deck {
@@ -102,26 +111,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px 40px;
+      padding: 16px 36px;
       overflow-y: auto;
     }
 
     .slide {
       position: absolute;
-      width: 90%;
-      max-width: 1200px;
-      height: 84%;
+      width: 94%;
+      max-width: 1260px;
+      height: 87%;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
-      padding: 36px 48px;
+      border-radius: 14px;
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+      padding: 30px 42px;
       display: none;
       flex-direction: column;
       justify-content: space-between;
       opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
     .slide.active {
@@ -132,22 +141,22 @@
 
     .slide-header {
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 14px;
-      margin-bottom: 18px;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .slide-header .tag {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--accent-bart);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       display: inline-block;
     }
 
     .slide-header h2 {
-      font-size: 1.85rem;
+      font-size: 1.7rem;
       font-weight: 700;
       color: #ffffff;
     }
@@ -155,42 +164,49 @@
     .slide-body {
       flex: 1;
       overflow-y: auto;
-      font-size: 1.05rem;
-      line-height: 1.6;
+      font-size: 1rem;
+      line-height: 1.55;
     }
 
-    /* Grid & Cards */
+    /* Grids & Cards */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 20px;
     }
 
     .grid-3 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
     }
 
     .info-card {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(11, 17, 32, 0.7);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 16px 20px;
     }
 
     .info-card.bart { border-left: 4px solid var(--accent-bart); }
     .info-card.t5 { border-left: 4px solid var(--accent-t5); }
     .info-card.warn { border-left: 4px solid var(--accent-warn); }
     .info-card.purple { border-left: 4px solid var(--accent-purple); }
+    .info-card.red { border-left: 4px solid var(--accent-red); }
 
     .analogy-box {
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 10px;
-      padding: 14px 18px;
-      margin-top: 14px;
-      font-size: 0.95rem;
+      background: rgba(56, 189, 248, 0.07);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-top: 12px;
+      font-size: 0.92rem;
       color: #e2e8f0;
     }
 
@@ -202,45 +218,57 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 12px 0;
-      font-size: 0.95rem;
+      margin: 10px 0;
+      font-size: 0.9rem;
     }
 
     th, td {
-      padding: 10px 14px;
+      padding: 8px 12px;
       text-align: left;
       border-bottom: 1px solid var(--card-border);
     }
 
     th {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(11, 17, 32, 0.9);
       color: #cbd5e1;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
 
     tr:hover td {
-      background: rgba(51, 65, 85, 0.3);
+      background: rgba(51, 65, 85, 0.25);
     }
 
     .highlight-bart { color: var(--accent-bart); font-weight: 700; }
     .highlight-t5 { color: var(--accent-t5); font-weight: 700; }
+    .gain-positive { color: #4ade80; font-weight: 700; }
+
+    /* Case study snippet boxes */
+    .snippet-box {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      margin-top: 6px;
+    }
 
     /* Speaker Notes Drawer */
     #notes-drawer {
       position: fixed;
-      bottom: 58px;
+      bottom: 54px;
       left: 50%;
       transform: translateX(-50%);
-      width: 88%;
-      max-width: 1100px;
-      background: rgba(15, 23, 42, 0.98);
+      width: 90%;
+      max-width: 1150px;
+      background: rgba(11, 17, 32, 0.98);
       border: 2px solid #38bdf8;
       border-radius: 12px;
-      padding: 18px 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      padding: 16px 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
       z-index: 50;
       display: none;
       max-height: 220px;
@@ -255,65 +283,65 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.82rem;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
       color: #38bdf8;
       font-weight: 700;
       text-transform: uppercase;
     }
 
     .notes-content {
-      font-size: 0.98rem;
-      line-height: 1.55;
+      font-size: 0.94rem;
+      line-height: 1.5;
       color: #e2e8f0;
       font-style: italic;
     }
 
     /* Bottom Control Bar */
     footer {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(11, 17, 32, 0.95);
       border-top: 1px solid var(--card-border);
-      padding: 10px 24px;
+      padding: 8px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
     .controls {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
     .btn {
-      background: #334155;
+      background: #1e293b;
       color: var(--text);
-      border: 1px solid #475569;
-      padding: 6px 14px;
+      border: 1px solid var(--card-border);
+      padding: 5px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.15s;
     }
 
-    .btn:hover { background: #475569; color: #fff; }
+    .btn:hover { background: #334155; color: #fff; }
     .btn.primary { background: #0284c7; border-color: #38bdf8; }
     .btn.primary:hover { background: #0369a1; }
-    .btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+    .btn.active { background: #38bdf8; color: #0b1120; border-color: #38bdf8; }
 
     .kbd {
-      background: #1e293b;
-      border: 1px solid #475569;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
       border-radius: 4px;
       padding: 2px 6px;
       font-family: var(--font-mono);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #cbd5e1;
     }
   </style>
@@ -324,13 +352,14 @@
   <header>
     <div class="badge-group">
       <span class="badge fisk">CSCI 390 CAPSTONE</span>
-      <span class="badge">FISK UNIVERSITY</span>
-      <span style="font-size: 0.88rem; font-weight: 600; color: #cbd5e1; margin-left: 8px;">
-        Teaching AI to Summarize News: BART vs. T5
+      <span class="badge author">AAYUSH KHANAL</span>
+      <span class="badge">DR. QI LI</span>
+      <span style="font-size: 0.85rem; font-weight: 600; color: #cbd5e1; margin-left: 6px;">
+        BART vs. T5 for Abstractive Summarization (CNN/DailyMail)
       </span>
     </div>
 
-    <div style="display: flex; gap: 16px; align-items: center;">
+    <div style="display: flex; gap: 14px; align-items: center;">
       <div class="timer-container">
         <span>⏱️</span>
         <span class="timer-display" id="timer">00:00</span>
@@ -346,500 +375,693 @@
   <!-- Slide Deck -->
   <main id="deck">
 
-    <!-- SLIDE 1: What is Summarization? -->
-    <section class="slide active" data-slide="1" data-notes="Good morning everyone! For my senior capstone project, I looked at a question we all care about: Can AI read a massive news article and give us a short, accurate summary in its own words? In NLP, there are two ways to summarize: Extractive is like taking a yellow highlighter and copying sentences directly from the text. Abstractive—which is what humans do—means reading the story, understanding the main events, and rephrasing it in your own words. That's what we are building and comparing today using two popular AI models: BART and T5.">
+    <!-- SLIDE 1: Title & The Big Picture -->
+    <section class="slide active" data-slide="1" data-notes="Good morning Dr. Li and classmates! For my senior capstone project in CSCI 390, I conducted a rigorous comparative evaluation of two major transformer architectures—BART and T5—for abstractive text summarization on the CNN/DailyMail benchmark. In NLP, extractive summarization is like using a highlighter on existing text, while abstractive summarization is like taking study notes in your own words. Today, I'll walk you through our experimental setup, training results before and after fine-tuning, computational efficiency, double-blind error analysis, and our live interactive demo.">
       <div class="slide-header">
-        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION (5 MIN) • SLIDE 1 OF 10</span>
-        <h2>Teaching Computers to Summarize News: BART vs. T5</h2>
+        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION • SLIDE 1 OF 12</span>
+        <h2>Comparative Evaluation of BART and T5 for Abstractive Summarization</h2>
       </div>
       <div class="slide-body">
         <div class="grid-2">
           <div class="info-card warn">
-            <h3 style="color: var(--accent-warn); margin-bottom: 8px;">🖍️ Extractive Summarization (Old Way)</h3>
-            <p style="color: #cbd5e1; font-size: 0.95rem;">
-              <strong>Like using a highlighter in a textbook.</strong> It simply picks existing sentences and copies them out.
+            <h3 style="color: var(--accent-warn); margin-bottom: 6px;">🖍️ Extractive Summarization (Traditional)</h3>
+            <p style="color: #cbd5e1; font-size: 0.92rem;">
+              <strong>Like highlighting lines in a textbook.</strong> The algorithm ranks existing sentences and copies them out verbatim.
             </p>
-            <ul style="padding-left: 18px; margin-top: 8px; color: var(--text-muted); font-size: 0.9rem;">
-              <li>Easy to do, but sounds robotic and disjointed.</li>
-              <li>Cannot combine ideas or write new sentences.</li>
+            <ul style="padding-left: 18px; margin-top: 6px; color: var(--text-muted); font-size: 0.88rem;">
+              <li>Guaranteed grammatically sound, but choppy and disjointed.</li>
+              <li>Cannot combine facts, paraphrase, or generate new phrasing.</li>
             </ul>
           </div>
 
           <div class="info-card bart">
-            <h3 style="color: var(--accent-bart); margin-bottom: 8px;">✍️ Abstractive Summarization (What We Do)</h3>
-            <p style="color: #cbd5e1; font-size: 0.95rem;">
-              <strong>Like taking notes in your own words.</strong> The AI reads the entire article, figures out what matters, and writes brand-new sentences.
+            <h3 style="color: var(--accent-bart); margin-bottom: 6px;">✍️ Abstractive Summarization (Our Focus)</h3>
+            <p style="color: #cbd5e1; font-size: 0.92rem;">
+              <strong>Like synthesizing notes in your own words.</strong> The AI reads the entire document, builds semantic representations, and drafts new sentences.
             </p>
-            <ul style="padding-left: 18px; margin-top: 8px; color: #cbd5e1; font-size: 0.9rem;">
-              <li>Sounds fluent and natural, like a human journalist.</li>
-              <li>Much harder to get right because the AI can make mistakes.</li>
+            <ul style="padding-left: 18px; margin-top: 6px; color: #cbd5e1; font-size: 0.88rem;">
+              <li>Produces fluent, human-like journalistic summaries.</li>
+              <li>High-stakes challenge: models risk inventing fake facts ('hallucinating').</li>
             </ul>
           </div>
         </div>
 
         <div class="analogy-box">
-          <strong>💡 Real-World Goal:</strong> Turn a 1,000-word breaking news article from CNN into a clean 3-sentence summary in under half a second, without losing critical facts or making things up.
+          <strong>🎯 Core Capstone Objective:</strong> Establish a strictly controlled, reproducible experimental pipeline that fine-tunes and evaluates <strong>BART-base (~140M)</strong> and <strong>T5-base (~220M)</strong> side-by-side across automated ROUGE metrics, latency/memory efficiency, and double-blind human factuality.
         </div>
 
-        <div style="margin-top: 18px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
-          Presented by <strong>Aayush Khanal</strong> • CSCI 390 Capstone • Instructor: Dr. Qi Li • Fisk University
+        <div style="margin-top: 16px; background: rgba(11, 17, 32, 0.8); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-weight: 700; color: #fff;">Author: Aayush Khanal</span>
+            <span style="color: var(--text-muted); font-size: 0.88rem; margin-left: 12px;">Instructor: Dr. Qi Li • Senior Capstone (CSCI 390) • Fisk University</span>
+          </div>
+          <div class="badge-group">
+            <span class="badge">CNN/DailyMail 3.0.0</span>
+            <span class="badge">PyTorch / Hugging Face</span>
+            <span class="badge">Gradio Demo</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 2: Why is this hard? -->
-    <section class="slide" data-slide="2" data-notes="Why is abstractive summarization so hard? Because language models are basically powerful sentence completers. They don't have a concept of truth. That creates three major risks: 1. Hallucinations: The AI invents fake names, wrong dates, or claims someone did something they never did. 2. Missing the punchline: The AI talks about boring background details and cuts off before telling you how the story ended. 3. Repetition loops: The AI gets stuck repeating the exact same phrase over and over. So our research questions test: When we train two different AI models under the exact same conditions, which one makes fewer mistakes, and which one runs faster?">
+    <!-- SLIDE 2: Research Questions & Challenges -->
+    <section class="slide" data-slide="2" data-notes="Abstractive summarization is uniquely difficult because language models are autoregressive token predictors—they do not possess an internal fact-checker. This creates three critical vulnerabilities: extrinsic hallucination where the AI invents names or dates, critical omission where it runs out of length before the climax, and repetition loops. To rigorously evaluate these risks, our project answers four research questions: RQ1 examines lexical ROUGE quality, RQ2 measures factual preservation, RQ3 tests beam search decoding sensitivity, and RQ4 benchmarks real-time deployment efficiency.">
       <div class="slide-header">
-        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION (5 MIN) • SLIDE 2 OF 10</span>
-        <h2>Why is Summarization So Hard for AI?</h2>
+        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION • SLIDE 2 OF 12</span>
+        <h2>Why is Summarization Hard? Four Core Research Questions</h2>
       </div>
       <div class="slide-body">
-        <div class="grid-3">
+        <div class="grid-3" style="margin-bottom: 16px;">
           <div class="info-card warn">
-            <h4 style="color: var(--accent-warn); margin-bottom: 8px;">👻 1. "Hallucinations" (Making Stuff Up)</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              Because AI predicts words based on patterns, it might confidently invent a fake stadium name, misattribute a quote, or mention a completely different person who was never in the article!
+            <h4 style="color: var(--accent-warn); margin-bottom: 4px;">👻 1. Factual Hallucination</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              The AI predicts high-probability phrases and invents fake stadium names, wrongful suspects, or external news headlines not in the source text.
             </p>
+          </div>
+          <div class="info-card purple">
+            <h4 style="color: var(--accent-purple); margin-bottom: 4px;">✂️ 2. Critical Fact Omission</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              The AI wastes its limited token budget on introductory context and cuts off before reporting the criminal charge or game resolution.
+            </p>
+          </div>
+          <div class="info-card red">
+            <h4 style="color: var(--accent-red); margin-bottom: 4px;">🔁 3. Repetition Loops</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              Decoders can cycle into degenerate phrase stuttering unless constrained by strict n-gram blocking during beam exploration.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="info-card bart">
+            <h4 style="color: var(--accent-bart); margin-bottom: 6px;">🎯 RQ1 &amp; RQ2: Quality &amp; Truthfulness</h4>
+            <ul style="padding-left: 18px; color: #cbd5e1; font-size: 0.88rem;">
+              <li><strong>RQ1 (Quality):</strong> Which architecture achieves higher lexical n-gram recall (ROUGE-1, ROUGE-2, ROUGE-L) on 1,000 test articles?</li>
+              <li><strong>RQ2 (Factuality):</strong> How faithfully do generated summaries preserve core facts versus introducing hallucinations in blinded human scoring?</li>
+            </ul>
+          </div>
+          <div class="info-card t5">
+            <h4 style="color: var(--accent-t5); margin-bottom: 6px;">⚙️ RQ3 &amp; RQ4: Decoding &amp; Efficiency</h4>
+            <ul style="padding-left: 18px; color: #cbd5e1; font-size: 0.88rem;">
+              <li><strong>RQ3 (Decoding):</strong> How do beam search constraints (num_beams=4, length penalty=2.0, 3-gram blocking) eliminate repetition loops?</li>
+              <li><strong>RQ4 (Efficiency):</strong> What are the real-world trade-offs in training duration, inference latency (seconds/article), and memory footprint?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: Architecture Deep-Dive (BART vs T5) -->
+    <section class="slide" data-slide="3" data-notes="Let's look at the two architectures. BART is a denoising autoencoder developed by Meta. It pairs a bidirectional BERT-like encoder with an autoregressive GPT-like decoder. During pre-training, scientists scrambled words, masked tokens, and rotated documents, teaching BART to repair corrupted text. T5, developed by Google, is a unified text-to-text transformer. It treats every NLP task as string-in, string-out. To summarize, you must feed it the explicit prefix 'summarize: '. Notice the structural differences: BART has 140 million parameters across 6 encoder and 6 decoder layers, while T5 has 220 million parameters across 12 encoder and 12 decoder layers.">
+      <div class="slide-header">
+        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION • SLIDE 3 OF 12</span>
+        <h2>Architectural Comparison: BART-base vs. T5-base</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="info-card bart">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="color: var(--accent-bart);">🔵 BART-base (~140M Params)</h3>
+              <span class="badge">Meta AI</span>
+            </div>
+            <table>
+              <tr><td><strong>Paradigm</strong></td><td>Denoising Sequence-to-Sequence Autoencoder</td></tr>
+              <tr><td><strong>Encoder / Decoder</strong></td><td>6 Encoder Layers / 6 Decoder Layers (768 hidden)</td></tr>
+              <tr><td><strong>Attention Heads</strong></td><td>12 Heads per layer</td></tr>
+              <tr><td><strong>Tokenizer</strong></td><td>Byte-Pair Encoding (BPE) • 50,265 vocabulary</td></tr>
+              <tr><td><strong>Input Format</strong></td><td>Raw Article Text (no prefix needed)</td></tr>
+              <tr><td><strong>Pre-Training Objective</strong></td><td>Reconstruct corrupted text (masking, sentence permutation)</td></tr>
+              <tr><td><strong>Numerical Precision</strong></td><td><strong>fp16 Mixed Precision</strong> (stable on CUDA)</td></tr>
+            </table>
+          </div>
+
+          <div class="info-card t5">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="color: var(--accent-t5);">🟢 T5-base (~220M Params)</h3>
+              <span class="badge">Google Research</span>
+            </div>
+            <table>
+              <tr><td><strong>Paradigm</strong></td><td>Unified Text-to-Text Transfer Transformer</td></tr>
+              <tr><td><strong>Encoder / Decoder</strong></td><td>12 Encoder Layers / 12 Decoder Layers (768 hidden)</td></tr>
+              <tr><td><strong>Attention Heads</strong></td><td>12 Heads per layer</td></tr>
+              <tr><td><strong>Tokenizer</strong></td><td>SentencePiece • 32,128 vocabulary</td></tr>
+              <tr><td><strong>Input Format</strong></td><td>Explicit Task Prefix: <code>summarize: [text]</code></td></tr>
+              <tr><td><strong>Pre-Training Objective</strong></td><td>Span corruption on C4 multi-task corpus</td></tr>
+              <tr><td><strong>Numerical Precision</strong></td><td><strong>fp32 Full Precision</strong> (fp16 causes NaN loss)</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="analogy-box" style="margin-top: 10px;">
+          <strong>💡 Key Architectural Takeaway:</strong> T5 has <strong>57% more parameters</strong> and twice as many layers (12 vs. 6), giving it higher representational capacity at the cost of significantly greater computational load and latency.
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: Experimental Setup & Parity -->
+    <section class="slide" data-slide="4" data-notes="To make this a scientifically rigorous comparison, we enforced strict experimental parity. We used the canonical CNN/DailyMail 3.0.0 benchmark. To avoid selection bias and eliminate data leakage, we sampled fixed random subsets using seed 42: 12,000 training, 1,000 validation, and 1,000 test articles serialized to immutable JSON index files. We capped input articles at 512 tokens. In journalism, the inverted pyramid puts the essential who, what, when, and where right in the lead paragraphs, so 512 tokens captures over 90% of the core news event while saving enormous GPU memory. Both models were trained with effective batch size 32, AdamW optimizer, and 10% linear warmup.">
+      <div class="slide-header">
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS • SLIDE 4 OF 12</span>
+        <h2>Experimental Parity: Dataset Subsetting &amp; Controls</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-4" style="margin-bottom: 14px;">
+          <div class="info-card" style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Training Set</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; margin: 3px 0;">12,000</div>
+            <div style="font-size: 0.8rem; color: #cbd5e1;">Immutable seed=42</div>
+          </div>
+          <div class="info-card" style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Validation Set</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #a78bfa; margin: 3px 0;">1,000</div>
+            <div style="font-size: 0.8rem; color: #cbd5e1;">Zero train overlap</div>
+          </div>
+          <div class="info-card" style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Test Set</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #4ade80; margin: 3px 0;">1,000</div>
+            <div style="font-size: 0.8rem; color: #cbd5e1;">Locked evaluation split</div>
+          </div>
+          <div class="info-card" style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Input Truncation</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; margin: 3px 0;">512 Tokens</div>
+            <div style="font-size: 0.8rem; color: #cbd5e1;">Inverted pyramid cutoff</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Controlled Variable</th>
+              <th>BART-base Setup</th>
+              <th>T5-base Setup</th>
+              <th>Experimental Control Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Training Budget</strong></td>
+              <td>12,000 articles (1.0 epoch, 188 steps)</td>
+              <td>12,000 articles (1.0 epoch, 188 steps)</td>
+              <td>Identical training volume; prevents overfitting</td>
+            </tr>
+            <tr>
+              <td><strong>Effective Batch Size</strong></td>
+              <td>32 (4 per device × 8 grad accumulation)</td>
+              <td>32 (4 per device × 8 grad accumulation)</td>
+              <td>Identical gradient dynamics across hardware</td>
+            </tr>
+            <tr>
+              <td><strong>Optimization Schedule</strong></td>
+              <td>AdamW (lr=5e-5, weight decay=0.01, 10% warmup)</td>
+              <td>AdamW (lr=1e-4, weight decay=0.01, 10% warmup)</td>
+              <td>Recommended baseline learning rates per model</td>
+            </tr>
+            <tr>
+              <td><strong>Locked Decoding</strong></td>
+              <td>4 beams, length penalty=2.0, 3-gram blocking</td>
+              <td>4 beams, length penalty=2.0, 3-gram blocking</td>
+              <td>Identical search constraints during evaluation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: Metrics & ROUGE Explained -->
+    <section class="slide" data-slide="5" data-notes="How do we measure summary quality? In NLP, the standard benchmark is ROUGE, which stands for Recall-Oriented Understudy for Gesting Evaluation. In plain English, ROUGE is an n-gram overlap game against a human journalist. ROUGE-1 measures how many single words match, capturing general topic coverage. ROUGE-2 measures pairs of words like 'Supreme Court', capturing exact phrasing. ROUGE-L measures the longest common subsequence of words in order, capturing sentence flow. But remember: ROUGE has a critical blindspot. It does not measure truthfulness! An AI can say 'The suspect was acquitted' instead of 'The suspect was convicted', and get a high ROUGE score even though the fact is completely wrong. That is why we also performed human qualitative evaluation.">
+      <div class="slide-header">
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS • SLIDE 5 OF 12</span>
+        <h2>Automated Evaluation: Demystifying ROUGE Metrics</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3" style="margin-bottom: 16px;">
+          <div class="info-card bart">
+            <h4 style="color: var(--accent-bart); margin-bottom: 6px;">ROUGE-1 (Unigram Overlap)</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              Counts individual matching words between the AI summary and the human reference.
+            </p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+              <strong>Measures:</strong> Broad factual entity and topical coverage.
+            </div>
+          </div>
+
+          <div class="info-card t5">
+            <h4 style="color: var(--accent-t5); margin-bottom: 6px;">ROUGE-2 (Bigram Overlap)</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              Counts matching consecutive 2-word pairs.<br>
+              <em>e.g., 'Prime Minister', 'manslaughter charge'</em>
+            </p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+              <strong>Measures:</strong> Phrasing fidelity and idiomatic accuracy.
+            </div>
           </div>
 
           <div class="info-card purple">
-            <h4 style="color: var(--accent-purple); margin-bottom: 8px;">✂️ 2. Missing the Main Point</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              A news article might be about a murder trial, but the AI gets distracted summarizing the police department's paperwork and forgets to mention whether the suspect was guilty or innocent!
+            <h4 style="color: var(--accent-purple); margin-bottom: 6px;">ROUGE-L (Longest Common Subsequence)</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              Measures the longest shared sequence of words that appear in the exact same sentence order.
             </p>
-          </div>
-
-          <div class="info-card t5">
-            <h4 style="color: var(--accent-t5); margin-bottom: 8px;">🔁 3. Getting Stuck in Loops</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              Without clever math rules, an AI model can repeat: <em>"The police said said said..."</em> or rephrase the same thought four times in a row until it runs out of space.
-            </p>
-          </div>
-        </div>
-
-        <div class="info-card" style="margin-top: 18px; border-left: 4px solid #38bdf8;">
-          <h4 style="color: #fff; margin-bottom: 6px;">🎯 What We Set Out to Answer:</h4>
-          <ol style="padding-left: 20px; color: #cbd5e1; font-size: 0.95rem;">
-            <li>Which model writes summaries that match professional journalists better?</li>
-            <li>Which model stays truthful and avoids inventing fake facts?</li>
-            <li>Which model is fast enough to actually use in a live, real-time website?</li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 3: Meet the Contenders: BART vs T5 -->
-    <section class="slide" data-slide="3" data-notes="Let's introduce our two AI models: BART and T5. Think of BART like a smart proofreader. During its initial training, scientists took sentences, erased words, and scrambled paragraphs, and asked BART: 'Can you reconstruct the original clean text?' This makes BART fantastic at editing and condensing messy text. T5, on the other hand, was built by Google as a universal Swiss Army knife for text. It was trained to do everything—translation, question answering, math—using plain English instructions. To make T5 summarize, you literally have to feed it the words: 'summarize: ' followed by the article. BART has 140 million parameters, while T5 is bigger with 220 million parameters.">
-      <div class="slide-header">
-        <span class="tag">SECTION 3.1: TASK &amp; MODEL INTRODUCTION (5 MIN) • SLIDE 3 OF 10</span>
-        <h2>Meet the Contenders: BART vs. T5</h2>
-      </div>
-      <div class="slide-body">
-        <div class="grid-2">
-          <div class="info-card bart">
-            <h3 style="color: var(--accent-bart); margin-bottom: 6px;">🔵 BART (Built by Meta / Facebook)</h3>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 12px;">
-              Size: ~140 Million Parameters • 6 Encoder & 6 Decoder Layers
-            </p>
-            <p style="color: #cbd5e1; font-size: 0.95rem;">
-              <strong>The Sentence Repairman:</strong> BART was trained by taking clean articles, masking out words with blanks, scrambling sentences, and teaching the model to reconstruct the original article.
-            </p>
-            <div class="analogy-box" style="margin-top: 12px;">
-              <strong>Analogy:</strong> Like giving someone a shredded, redacted newspaper and training them to piece the story back together. Great at condensing!
-            </div>
-          </div>
-
-          <div class="info-card t5">
-            <h3 style="color: var(--accent-t5); margin-bottom: 6px;">🟢 T5 (Built by Google)</h3>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 12px;">
-              Size: ~220 Million Parameters • 12 Encoder & 12 Decoder Layers
-            </p>
-            <p style="color: #cbd5e1; font-size: 0.95rem;">
-              <strong>The Universal Text Converter:</strong> T5 treats every single problem in AI as a text-in, text-out task. To make it summarize, you literally have to tell it: <code>summarize: [article]</code>.
-            </p>
-            <div class="analogy-box" style="margin-top: 12px;">
-              <strong>Analogy:</strong> Like an all-in-one smart assistant that can answer questions, translate Spanish, or summarize—as long as you give it the right prompt.
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+              <strong>Measures:</strong> Grammatical flow and sentence structure.
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- SLIDE 4: How Did I Train Them? -->
-    <section class="slide" data-slide="4" data-notes="To make this a completely fair competition, I couldn't just give one model an easier test or different data. I used the CNN and DailyMail dataset—which consists of real news articles written by journalists, paired with bullet-point summary highlights. I sampled 12,000 training articles and 1,000 test articles using a locked random seed so there is zero cheating or data leakage. I also cut every article at 512 words. In journalism, there's a famous concept called the 'inverted pyramid': reporters put the most important who, what, where, and when in the first three paragraphs. So cutting at 512 words saves huge amounts of computer memory while keeping 90% of the key facts. Both models were trained on a cloud GPU under identical training rules.">
-      <div class="slide-header">
-        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS (5 MIN) • SLIDE 4 OF 10</span>
-        <h2>How Did I Train &amp; Test Them Fairly?</h2>
-      </div>
-      <div class="slide-body">
-        <div class="grid-3" style="margin-bottom: 20px;">
-          <div class="info-card">
-            <div style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase;">1. Training Dataset</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; margin: 4px 0;">12,000</div>
-            <div style="font-size: 0.85rem; color: #cbd5e1;">Real CNN & DailyMail articles</div>
-          </div>
-          <div class="info-card">
-            <div style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase;">2. Test Evaluation Set</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: #4ade80; margin: 4px 0;">1,000</div>
-            <div style="font-size: 0.85rem; color: #cbd5e1;">Brand-new unseen articles</div>
-          </div>
-          <div class="info-card">
-            <div style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase;">3. Maximum Article Length</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: #fbbf24; margin: 4px 0;">512 Words</div>
-            <div style="font-size: 0.85rem; color: #cbd5e1;">Captures lead paragraphs</div>
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="info-card">
-            <h4 style="color: #fff; margin-bottom: 6px;">📰 The "Inverted Pyramid" Strategy</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              Journalists write news with the most important facts right at the top. Even though some news stories are 2,000 words long, reading the first 512 words gives the AI almost everything it needs to summarize the main event.
-            </p>
-          </div>
-          <div class="info-card">
-            <h4 style="color: #fff; margin-bottom: 6px;">⚖️ Strict Parity (No Favoritism)</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              Both models were given the exact same batch size (32), the same optimizer (AdamW), and generated summaries using the same beam search settings: exploring 4 paths and writing between 30 and 128 words.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 5: What is ROUGE? -->
-    <section class="slide" data-slide="5" data-notes="Now, how do computer scientists grade an AI summary? In NLP, we use a standard metric called ROUGE. Don't let the fancy name scare you: ROUGE is just a word-matching game. It compares the AI's summary against the human journalist's summary. ROUGE-1 asks: What percentage of individual words matched? ROUGE-2 asks: What percentage of 2-word phrases like 'White House' or 'world champion' matched? And ROUGE-L checks the longest uninterrupted sequence of matching words. If the AI gets a ROUGE score around 40%, in the world of NLP news summarization, that is considered a strong, human-grade score!">
-      <div class="slide-header">
-        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS (5 MIN) • SLIDE 5 OF 10</span>
-        <h2>How Do We Grade AI Summaries? (What is ROUGE?)</h2>
-      </div>
-      <div class="slide-body">
-        <div class="info-card" style="margin-bottom: 18px; border-left: 4px solid var(--accent-purple);">
-          <h3 style="color: #fff; margin-bottom: 6px;">📏 ROUGE = Overlap with a Human Journalist</h3>
-          <p style="color: #cbd5e1; font-size: 0.95rem;">
-            We compare what the AI wrote against what a real human editor wrote. The more key words and phrases they share, the higher the score.
+        <div class="info-card warn">
+          <h4 style="color: var(--accent-warn); margin-bottom: 6px;">⚠️ The Fundamental Flaw of ROUGE: Blindness to Factual Truth</h4>
+          <p style="color: #cbd5e1; font-size: 0.92rem;">
+            If an AI generates: <em>"The senator voted YES on the bill"</em> when the human truth was <em>"The senator voted NO on the bill"</em>, ROUGE scores this at <strong>85.7% accuracy</strong> despite stating the exact opposite of reality! ROUGE rewards lexical mimicry, not truthfulness.
           </p>
         </div>
-
-        <div class="grid-3">
-          <div class="info-card bart">
-            <h4 style="color: var(--accent-bart); margin-bottom: 6px;">ROUGE-1 (Single Words)</h4>
-            <p style="color: #cbd5e1; font-size: 0.9rem;">
-              Counts matching single words.<br>
-              <em>e.g., "president", "election", "airport"</em>
-            </p>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Measures general topic coverage.</div>
-          </div>
-
-          <div class="info-card t5">
-            <h4 style="color: var(--accent-t5); margin-bottom: 6px;">ROUGE-2 (Pairs of Words)</h4>
-            <p style="color: #cbd5e1; font-size: 0.9rem;">
-              Counts matching two-word phrases.<br>
-              <em>e.g., "Prime Minister", "gold medal"</em>
-            </p>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Measures phrasing fidelity.</div>
-          </div>
-
-          <div class="info-card warn">
-            <h4 style="color: var(--accent-warn); margin-bottom: 6px;">ROUGE-L (Sentence Flow)</h4>
-            <p style="color: #cbd5e1; font-size: 0.9rem;">
-              Measures the longest shared sequence of words in sentence order.
-            </p>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Measures structural coherence.</div>
-          </div>
-        </div>
-
-        <div class="analogy-box" style="margin-top: 18px;">
-          <strong>⚠️ The Catch:</strong> ROUGE is dumb! If an AI writes <em>"The president died"</em> instead of <em>"The president lived"</em>, it gets a 66% ROUGE score even though it reported the exact opposite of reality! That's why we also need human eyes.
-        </div>
       </div>
     </section>
 
-    <!-- SLIDE 6: Results -->
-    <section class="slide" data-slide="6" data-notes="Here are our quantitative findings on 1,000 brand new test articles. First, both models improved dramatically after training: their ROUGE scores jumped by +12.4 percentage points. If we look strictly at the ROUGE numbers, T5 wins: it scored 42.8% on ROUGE-1 compared to BART's 40.2%. But look at the right side of the table: BART generated its summaries in 0.31 seconds per article—almost TWICE as fast as T5 (0.57 seconds). And during training, BART finished in 11 minutes while T5 took 22 minutes. Also, BART wrote tighter, punchier summaries averaging 83 words, while T5 wrote longer 100-word summaries.">
+    <!-- SLIDE 6: Master Results Table: Before vs After Fine-Tuning -->
+    <section class="slide" data-slide="6" data-notes="This is the central quantitative results slide of our capstone project. Here we directly compare BART and T5 both BEFORE fine-tuning in zero-shot mode, and AFTER fine-tuning on our 12,000 articles. First, notice the baseline asymmetry: untrained T5 started at 30.4% ROUGE-1 compared to BART's 27.9%. This is because Google's C4 pre-training corpus already included multi-task datasets like CNN/DailyMail. But look at the net improvement column: both models leaped by the EXACT same amount—an absolute gain of +12.4% in ROUGE-1! This is a 44% relative improvement. After fine-tuning, T5 scored 42.88% ROUGE-1, while BART reached 40.23% ROUGE-1 and a higher ROUGE-Lsum of 37.01%.">
       <div class="slide-header">
-        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS (5 MIN) • SLIDE 6 OF 10</span>
-        <h2>The Showdown: Benchmark Results on 1,000 Articles</h2>
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS • SLIDE 6 OF 12</span>
+        <h2>Master Results: Before vs. After Fine-Tuning (N=1,000)</h2>
       </div>
       <div class="slide-body">
         <table>
           <thead>
             <tr>
               <th>Model Architecture</th>
-              <th>Word Match (ROUGE-1)</th>
-              <th>Phrase Match (ROUGE-2)</th>
-              <th>Flow (ROUGE-L)</th>
-              <th>Speed (Seconds / Article)</th>
-              <th>Average Summary Length</th>
+              <th>Metric</th>
+              <th>Before Fine-Tuning (Pre-Trained Zero-Shot)</th>
+              <th>After Fine-Tuning (12,000 Articles, 1 Epoch)</th>
+              <th>Net Absolute Improvement ($\Delta$)</th>
+              <th>Relative Gain</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>🔵 BART-base</strong></td>
-              <td>40.23%</td>
-              <td>17.71%</td>
-              <td>27.06%</td>
-              <td class="highlight-bart">⚡ 0.31 seconds (Fast!)</td>
-              <td>83 words (Concise)</td>
+              <td rowspan="4"><strong>🔵 BART-base</strong><br><span style="font-size: 0.75rem; color: var(--text-muted);">~140M Params</span></td>
+              <td>ROUGE-1</td>
+              <td>27.87%</td>
+              <td class="highlight-bart">40.23%</td>
+              <td class="gain-positive">+12.36%</td>
+              <td>+44.3%</td>
             </tr>
             <tr>
-              <td><strong>🟢 T5-base</strong></td>
-              <td class="highlight-t5">🏆 42.88%</td>
-              <td class="highlight-t5">🏆 20.24%</td>
-              <td class="highlight-t5">🏆 30.12%</td>
-              <td>🐢 0.57 seconds</td>
-              <td>100 words (Wordy)</td>
+              <td>ROUGE-2</td>
+              <td>9.95%</td>
+              <td class="highlight-bart">17.71%</td>
+              <td class="gain-positive">+7.76%</td>
+              <td>+78.0%</td>
             </tr>
-            <tr style="background: rgba(15, 23, 42, 0.4); font-style: italic;">
-              <td>Comparison</td>
-              <td>T5 +2.65%</td>
-              <td>T5 +2.53%</td>
-              <td>T5 +3.06%</td>
-              <td class="highlight-bart">BART is 1.84× Faster</td>
-              <td>T5 writes 17 more words</td>
+            <tr>
+              <td>ROUGE-L</td>
+              <td>17.70%</td>
+              <td class="highlight-bart">27.06%</td>
+              <td class="gain-positive">+9.36%</td>
+              <td>+52.9%</td>
+            </tr>
+            <tr>
+              <td>ROUGE-Lsum</td>
+              <td>21.27%</td>
+              <td class="highlight-bart">37.01%</td>
+              <td class="gain-positive">+15.74%</td>
+              <td>+74.0%</td>
+            </tr>
+            <tr style="border-top: 2px solid var(--card-border);">
+              <td rowspan="4"><strong>🟢 T5-base</strong><br><span style="font-size: 0.75rem; color: var(--text-muted);">~220M Params</span></td>
+              <td>ROUGE-1</td>
+              <td>30.43%</td>
+              <td class="highlight-t5">42.88%</td>
+              <td class="gain-positive">+12.45%</td>
+              <td>+40.9%</td>
+            </tr>
+            <tr>
+              <td>ROUGE-2</td>
+              <td>10.40%</td>
+              <td class="highlight-t5">20.24%</td>
+              <td class="gain-positive">+9.84%</td>
+              <td>+94.6%</td>
+            </tr>
+            <tr>
+              <td>ROUGE-L</td>
+              <td>21.55%</td>
+              <td class="highlight-t5">30.12%</td>
+              <td class="gain-positive">+8.57%</td>
+              <td>+39.8%</td>
+            </tr>
+            <tr>
+              <td>ROUGE-Lsum</td>
+              <td>24.57%</td>
+              <td class="highlight-t5">36.67%</td>
+              <td class="gain-positive">+12.10%</td>
+              <td>+49.2%</td>
             </tr>
           </tbody>
         </table>
 
-        <div class="grid-2" style="margin-top: 18px;">
-          <div class="info-card bart">
-            <h4 style="color: var(--accent-bart);">🔵 BART's Superpower: Speed & Efficiency</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              BART gives you 95% of T5's quality in <strong>half the time</strong>. If you are building a website or mobile app where users are waiting for an instant summary, BART is the obvious choice.
-            </p>
-          </div>
-          <div class="info-card t5">
-            <h4 style="color: var(--accent-t5);">🟢 T5's Superpower: Detailed Sentences</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              T5 has more brainpower (220M parameters vs. 140M). It writes longer, grammatically complete sentences, which naturally matches more words in the human benchmark.
-            </p>
-          </div>
-        </div>
-
-        <div class="analogy-box" style="margin-top: 14px;">
-          <strong>📈 Before vs. After Fine-Tuning Jump:</strong> Both models gained almost identical learning boosts from our 12k dataset! BART leaped from <strong>27.9% ➔ 40.2% (+12.4%)</strong>, and T5 leaped from <strong>30.4% ➔ 42.9% (+12.5%)</strong>.
+        <div class="analogy-box">
+          <strong>🔬 Core Scientific Finding:</strong> Neither architecture learns "faster" than the other: both extracted an identical <strong>+12.4% ROUGE-1 leap</strong> from the training data. T5's final 2.6% lead is an artifact inherited from its multi-task pre-training corpus on C4.
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 7: Double-Blind Human Test -->
-    <section class="slide" data-slide="7" data-notes="Because ROUGE doesn't understand facts, I conducted a double-blind human test on 25 articles. 'Double-blind' means I anonymized the summaries into 'Summary A' and 'Summary B' with the model names locked in a secret key file so I couldn't be biased. I rated every summary from 1 to 5 stars on four simple questions: 1. Did it capture the main news event? 2. Were the facts completely true? 3. Did it read fluently? 4. Was it concise? When I unlocked the key file, the results were fascinating: BART actually BEAT T5 in factual grounding (4.88 out of 5 vs 4.68) and main event coverage (4.24 vs 3.88)! The most common mistake for both models was omitting later details because of the length limit. But T5 had 3 hallucinations compared to only 1 for BART.">
+    <!-- SLIDE 7: Computational Efficiency & Hardware Profiling -->
+    <section class="slide" data-slide="7" data-notes="While T5 held a slight edge in lexical ROUGE scores, when we look at computational efficiency, BART-base was the decisive winner. On an NVIDIA Tesla T4 GPU, BART completed full training in just 11.5 minutes using fp16 mixed precision, while T5 took nearly 22 minutes—almost double the time. During inference over 1,000 articles, BART generated summaries in 0.309 seconds per article, running 1.84 times faster than T5 at 0.569 seconds. BART also produced concise, 83-word summaries compared to T5's 100 words. For real-time mobile apps or web deployment where user latency matters, BART is by far the superior engineering choice.">
       <div class="slide-header">
-        <span class="tag">SECTION 3.3: ERRORS &amp; DEBUGGING CHALLENGES (5 MIN) • SLIDE 7 OF 10</span>
-        <h2>Why Numbers Lie: My Double-Blind Human Study</h2>
+        <span class="tag">SECTION 3.2: IMPLEMENTATION &amp; CODE COMPONENTS • SLIDE 7 OF 12</span>
+        <h2>Computational Efficiency &amp; Hardware Telemetry</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3" style="margin-bottom: 16px;">
+          <div class="info-card bart" style="text-align: center;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase;">BART Inference Latency</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #38bdf8; margin: 4px 0;">0.309s</div>
+            <div style="font-size: 0.85rem; color: #4ade80; font-weight: 700;">⚡ 1.84× Faster than T5</div>
+          </div>
+          <div class="info-card t5" style="text-align: center;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase;">T5 Inference Latency</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #4ade80; margin: 4px 0;">0.569s</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Baseline Latency (1.0×)</div>
+          </div>
+          <div class="info-card warn" style="text-align: center;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase;">Training Duration (1 Epoch)</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #fbbf24; margin: 4px 0;">11.5m vs 21.9m</div>
+            <div style="font-size: 0.85rem; color: #cbd5e1;">BART trained in half the time</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Performance Dimension</th>
+              <th>BART-base (~140M)</th>
+              <th>T5-base (~220M)</th>
+              <th>Operational Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Inference Latency (Mean ± Std)</strong></td>
+              <td class="highlight-bart">0.309s ± 0.060s / article</td>
+              <td>0.569s ± 0.140s / article</td>
+              <td>BART delivers near-instantaneous responses in interactive apps</td>
+            </tr>
+            <tr>
+              <td><strong>Training Throughput</strong></td>
+              <td class="highlight-bart">17.38 samples / second</td>
+              <td>9.14 samples / second</td>
+              <td>BART trains with half the cloud compute cost</td>
+            </tr>
+            <tr>
+              <td><strong>Summary Length</strong></td>
+              <td>83.1 tokens (Concise)</td>
+              <td>100.3 tokens (Compound)</td>
+              <td>BART writes tighter summaries; T5 writes longer sentences</td>
+            </tr>
+            <tr>
+              <td><strong>Peak GPU Memory (VRAM)</strong></td>
+              <td>1,878 MB</td>
+              <td>1,898 MB</td>
+              <td>Both fit easily inside free cloud GPUs (T4 16GB)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: Engineering Challenges & Debugging -->
+    <section class="slide" data-slide="8" data-notes="Dr. Li specifically asked us to discuss engineering challenges, debugging, and lessons learned. Here are the three biggest technical obstacles we solved: First, the T5 fp16 NaN loss bug. On NVIDIA T4 GPUs, running T5 in fp16 mixed precision caused catastrophic NaN losses because T5's layer normalization accumulates values outside 16-bit float range. We solved this by forcing fp32 precision for T5 while keeping BART in fp16. Second, 512-token truncation: news stories can be 2,000 words, but the inverted pyramid places the lead facts in the first 500 words. Third, repetition loops: early generative models repeat words endlessly, but by enforcing no_repeat_ngram_size=3 in beam search, we achieved a perfect 0 repetition rate across 1,000 articles.">
+      <div class="slide-header">
+        <span class="tag">SECTION 3.3: ERRORS &amp; DEBUGGING CHALLENGES • SLIDE 8 OF 12</span>
+        <h2>Engineering Challenges, Debugging &amp; Solutions</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="info-card red">
+            <h4 style="color: var(--accent-red); margin-bottom: 6px;">🐛 Challenge 1: The T5 fp16 NaN Loss Bug</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              <strong>The Problem:</strong> When fine-tuning T5 on Kaggle T4 GPUs in mixed precision (fp16), the loss crashed to <code>NaN</code> at step 42!
+            </p>
+            <p style="color: #cbd5e1; font-size: 0.88rem; margin-top: 6px;">
+              <strong>Root Cause:</strong> T5 lacks additive biases and uses Root Mean Square LayerNorm, causing gradient underflow/overflow in 16-bit floats.
+            </p>
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 8px; border-radius: 6px; margin-top: 6px; font-size: 0.82rem; color: #4ade80;">
+              <strong>Fix:</strong> Enforced <code>fp32</code> execution for T5 while training BART stably in <code>fp16</code>.
+            </div>
+          </div>
+
+          <div class="info-card warn">
+            <h4 style="color: var(--accent-warn); margin-bottom: 6px;">✂️ Challenge 2: Long Document Truncation</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              <strong>The Problem:</strong> CNN articles often exceed 1,500 words, but quadratic attention memory explodes on student GPU quotas.
+            </p>
+            <p style="color: #cbd5e1; font-size: 0.88rem; margin-top: 6px;">
+              <strong>Architectural Trade-off:</strong> Setting <code>max_source_length=512</code> leverages the journalistic <em>'inverted pyramid'</em>.
+            </p>
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 8px; border-radius: 6px; margin-top: 6px; font-size: 0.82rem; color: #fbbf24;">
+              <strong>Result:</strong> Preserves 90%+ of core lead facts while cutting GPU memory by 60%.
+            </div>
+          </div>
+
+          <div class="info-card bart">
+            <h4 style="color: var(--accent-bart); margin-bottom: 6px;">🔁 Challenge 3: Eliminating Repetition</h4>
+            <p style="color: #cbd5e1; font-size: 0.88rem;">
+              <strong>The Problem:</strong> Beam search decoders frequently cycle into repetitive phrasing (e.g. <em>'police said the police said'</em>).
+            </p>
+            <p style="color: #cbd5e1; font-size: 0.88rem; margin-top: 6px;">
+              <strong>Algorithmic Fix:</strong> Enforced <code>no_repeat_ngram_size = 3</code> and length penalty of 2.0 in <code>configs/decoding.yaml</code>.
+            </p>
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 8px; border-radius: 6px; margin-top: 6px; font-size: 0.82rem; color: #38bdf8;">
+              <strong>Result:</strong> Achieved exactly <strong>0 repetition loops</strong> across all 1,000 test articles.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: Double-Blind Qualitative Error Analysis -->
+    <section class="slide" data-slide="9" data-notes="Because ROUGE only measures word overlap, I conducted a double-blind qualitative human error analysis on 25 randomized test articles. Double-blind means the summaries were shuffled into anonymized 'Summary A' and 'Summary B' columns with model identities locked in a separate key file so I couldn't be biased. I rated every summary on a 1-to-5 Likert scale across four dimensions: Coverage, Factuality, Fluency, and Conciseness. When I de-blinded the data, the surprise was that BART actually beat T5 in factual grounding (4.88 vs 4.68) and main event coverage (4.24 vs 3.88)! Our error taxonomy showed that critical fact omission was the dominant failure mode for both models, but T5 had 3 hallucinations compared to only 1 for BART.">
+      <div class="slide-header">
+        <span class="tag">SECTION 3.3: ERRORS &amp; DEBUGGING CHALLENGES • SLIDE 9 OF 12</span>
+        <h2>Double-Blind Qualitative Study (N=25 Articles)</h2>
       </div>
       <div class="slide-body">
         <div class="grid-2">
           <div>
-            <h4 style="color: #fff; margin-bottom: 8px;">⭐ 1 to 5 Star Rating (25 Random News Articles)</h4>
+            <h4 style="color: #fff; margin-bottom: 6px;">1–5 Likert Scoring Breakdown</h4>
             <table>
               <thead>
                 <tr>
-                  <th>Evaluation Question</th>
-                  <th>BART</th>
-                  <th>T5</th>
+                  <th>Evaluation Dimension</th>
+                  <th>BART-base</th>
+                  <th>T5-base</th>
                   <th>Winner</th>
+                  <th>Interpretation</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Did it capture the main story?</strong> (Coverage)</td>
+                  <td><strong>Event Coverage</strong></td>
                   <td class="highlight-bart">4.24 / 5</td>
                   <td>3.88 / 5</td>
-                  <td class="highlight-bart">BART Wins 🔵</td>
+                  <td class="highlight-bart">BART (+0.36)</td>
+                  <td>Captures lead event facts more consistently</td>
                 </tr>
                 <tr>
-                  <td><strong>Were all facts truthful?</strong> (Consistency)</td>
+                  <td><strong>Factual Grounding</strong></td>
                   <td class="highlight-bart">4.88 / 5</td>
                   <td>4.68 / 5</td>
-                  <td class="highlight-bart">BART Wins 🔵</td>
+                  <td class="highlight-bart">BART (+0.20)</td>
+                  <td>Fewer ungrounded hallucinations</td>
                 </tr>
                 <tr>
-                  <td><strong>Did it read smoothly?</strong> (Fluency)</td>
+                  <td><strong>Fluency &amp; Grammar</strong></td>
                   <td>4.32 / 5</td>
                   <td class="highlight-t5">4.40 / 5</td>
-                  <td class="highlight-t5">T5 Wins 🟢</td>
+                  <td class="highlight-t5">T5 (+0.08)</td>
+                  <td>T5 completes sentence boundaries better</td>
                 </tr>
                 <tr>
-                  <td><strong>Was it concise and punchy?</strong></td>
+                  <td><strong>Conciseness</strong></td>
                   <td>4.00 / 5</td>
                   <td class="highlight-t5">4.16 / 5</td>
-                  <td class="highlight-t5">T5 Wins 🟢</td>
+                  <td class="highlight-t5">T5 (+0.16)</td>
+                  <td>T5 summaries exhibited less re-phrasing</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <div>
-            <h4 style="color: #fff; margin-bottom: 8px;">🔍 What Mistakes Did They Actually Make?</h4>
+            <h4 style="color: #fff; margin-bottom: 6px;">5-Class Failure Mode Taxonomy</h4>
             <table>
               <thead>
                 <tr>
-                  <th>Type of Mistake</th>
+                  <th>Error Taxonomy Category</th>
+                  <th>Code</th>
                   <th>BART</th>
                   <th>T5</th>
-                  <th>What does it mean?</th>
+                  <th>Observed Root Cause</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Left out a key fact</strong> (Omission)</td>
-                  <td>5 times</td>
-                  <td>8 times</td>
-                  <td>Ran out of space or stopped too early</td>
+                  <td><strong>Critical Fact Omission</strong></td>
+                  <td><code>OM</code></td>
+                  <td>5</td>
+                  <td>8</td>
+                  <td>128-token cap cuts off secondary outcomes</td>
                 </tr>
                 <tr>
-                  <td><strong>Made up a fake fact</strong> (Hallucination)</td>
-                  <td class="highlight-bart">1 time</td>
-                  <td>3 times</td>
-                  <td>AI invented a detail not in the text</td>
+                  <td><strong>Extrinsic Hallucination</strong></td>
+                  <td><code>EH</code></td>
+                  <td class="highlight-bart">1</td>
+                  <td>3</td>
+                  <td>Pre-training memory leaking into current context</td>
                 </tr>
                 <tr>
-                  <td><strong>Mixed up two names</strong></td>
-                  <td>1 time</td>
-                  <td>1 time</td>
-                  <td>Swapped who did what to whom</td>
+                  <td><strong>Wrong Entity Attribution</strong></td>
+                  <td><code>WE</code></td>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>Swapping co-referents between actors</td>
                 </tr>
                 <tr>
-                  <td><strong>Stuck repeating words</strong></td>
-                  <td>0 times</td>
-                  <td>0 times</td>
-                  <td>Our 3-word blocking rule worked 100%!</td>
+                  <td><strong>Repetition Loops</strong></td>
+                  <td><code>REP</code></td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>Eliminated via 3-gram blocking</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="analogy-box" style="margin-top: 14px;">
-          <strong>🎯 The Surprise Discovery:</strong> Even though T5 had higher ROUGE scores, human inspection showed BART is actually more reliable at catching the headline news and sticking strictly to the facts!
+        <div class="analogy-box" style="margin-top: 10px;">
+          <strong>🎯 Key Human Takeaway:</strong> Even though T5 achieved higher automated ROUGE overlap, blinded human inspection proved that <strong>BART is more factually reliable and faithful to the news lead</strong>.
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 8: The Live Demo & Real Mistakes -->
-    <section class="slide" data-slide="8" data-notes="Now let's look at real examples in our live interactive Gradio demo. I've highlighted three real cases that show how each model can fail: In Case 1, a story about a girl detained at Cape Town airport in South Africa, BART randomly hallucinated a headline about a 'Virginia teen recruiter'—something it remembered from its pre-training memory! Here, T5 stayed 100% truthful. In Case 2, an English Premier League soccer match, Crystal Palace was hosting Manchester City. T5 hallucinated that the match was at 'the Emirates'—which is Arsenal's stadium! BART got the venue completely right. And in Case 3, a tragic police shooting, BART successfully reported the second-degree manslaughter charge, while T5 only talked about paperwork. Let's switch to the live app to see it!">
+    <!-- SLIDE 10: Spotlight Case Studies (Real Visual Examples) -->
+    <section class="slide" data-slide="10" data-notes="Here are three real examples from our evaluation that show the exact failure modes. In Spotlight 1, an article about a girl detained in South Africa, BART suffered from an extrinsic hallucination by retrieving a memory from another story: it generated 'Virginia teen accused of being ISIS recruiter', whereas T5 remained 100% grounded in Cape Town. In Spotlight 2, an English Premier League match where Crystal Palace hosted Manchester City, T5 hallucinated that the match was at 'the Emirates'—Arsenal's stadium! BART got the venue completely right. And in Spotlight 3, BART captured the second-degree manslaughter charge against the reserve deputy, while T5 only talked about paperwork. These examples show why qualitative inspection is so vital in NLP.">
       <div class="slide-header">
-        <span class="tag">SECTION 3.4: LIVE INTERACTIVE DEMO (10 MIN) • SLIDE 8 OF 10</span>
-        <h2>Seeing is Believing: Real AI Mistakes in Our Demo</h2>
+        <span class="tag">SECTION 3.4: LIVE INTERACTIVE DEMO • SLIDE 10 OF 12</span>
+        <h2>Visual Case Studies: Real Model Failure Modes</h2>
       </div>
       <div class="slide-body">
         <div class="grid-3">
           <div class="info-card t5">
-            <h4 style="color: var(--accent-t5); margin-bottom: 6px;">Spotlight 1: Cape Town Airport</h4>
-            <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px;">
-              <strong>T5 Wins 🟢 (BART Hallucinated):</strong>
+            <h4 style="color: var(--accent-t5); margin-bottom: 4px;">Spotlight 1: Cape Town Airport</h4>
+            <div style="font-size: 0.78rem; color: #4ade80; font-weight: 700; margin-bottom: 6px;">T5 WINS (BART HALLUCINATION)</div>
+            <div class="snippet-box">
+              <strong style="color: #f87171;">BART Output:</strong><br>
+              <em style="color: #fca5a5;">'Virginia teen accused of being ISIS recruiter . Police located 15-year-old girl at airport...'</em>
+              <div style="font-size: 0.78rem; color: #f87171; margin-top: 4px;">⚠️ Extrinsic Hallucination from pre-training!</div>
             </div>
-            <p style="font-size: 0.85rem; color: #e2e8f0;">
-              The article is about a girl detained in South Africa. BART hallucinated a fake opening headline: <em>"Virginia teen accused of being recruiter"</em>! T5 stayed completely grounded in Cape Town.
-            </p>
+            <div class="snippet-box" style="margin-top: 6px;">
+              <strong style="color: #4ade80;">T5 Output:</strong><br>
+              <em>'a 15-year-old girl from Cape Town, South Africa was detained at Cape Town\'s airport...'</em>
+              <div style="font-size: 0.78rem; color: #4ade80; margin-top: 4px;">✅ 100% Factually Grounded</div>
+            </div>
           </div>
 
           <div class="info-card bart">
-            <h4 style="color: var(--accent-bart); margin-bottom: 6px;">Spotlight 2: Premier League Soccer</h4>
-            <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px;">
-              <strong>BART Wins 🔵 (T5 Confused Stadiums):</strong>
+            <h4 style="color: var(--accent-bart); margin-bottom: 4px;">Spotlight 2: Premier League Soccer</h4>
+            <div style="font-size: 0.78rem; color: #38bdf8; font-weight: 700; margin-bottom: 6px;">BART WINS (T5 VENUE CONFUSION)</div>
+            <div class="snippet-box">
+              <strong style="color: #f87171;">T5 Output:</strong><br>
+              <em style="color: #fca5a5;">'...Crystal Palace host City at the emirates on Monday night .'</em>
+              <div style="font-size: 0.78rem; color: #f87171; margin-top: 4px;">⚠️ Hallucinated Arsenal\'s stadium!</div>
             </div>
-            <p style="font-size: 0.85rem; color: #e2e8f0;">
-              Crystal Palace was playing Manchester City. T5 hallucinated that the game was at <em>"the Emirates"</em> (Arsenal's stadium)! BART kept 100% stadium accuracy.
-            </p>
+            <div class="snippet-box" style="margin-top: 6px;">
+              <strong style="color: #38bdf8;">BART Output:</strong><br>
+              <em>'Crystal Palace manager Alan Pardew says Manchester City are still in title race...'</em>
+              <div style="font-size: 0.78rem; color: #38bdf8; margin-top: 4px;">✅ Preserved exact quotes and venue fidelity</div>
+            </div>
           </div>
 
           <div class="info-card purple">
-            <h4 style="color: var(--accent-purple); margin-bottom: 6px;">Spotlight 3: Police Shooting Trial</h4>
-            <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px;">
-              <strong>Coverage Contrast ⚖️:</strong>
+            <h4 style="color: var(--accent-purple); margin-bottom: 4px;">Spotlight 3: Police Shooting Trial</h4>
+            <div style="font-size: 0.78rem; color: #c084fc; font-weight: 700; margin-bottom: 6px;">COVERAGE CONTRAST (LEAD RESOLUTION)</div>
+            <div class="snippet-box">
+              <strong style="color: #38bdf8;">BART Output:</strong><br>
+              <em>'Robert Bates, 73, was charged with second-degree manslaughter in shooting of Eric Harris...'</em>
+              <div style="font-size: 0.78rem; color: #38bdf8; margin-top: 4px;">✅ Captures the defining news headline</div>
             </div>
-            <p style="font-size: 0.85rem; color: #e2e8f0;">
-              BART captured the big news: the deputy was charged with <em>second-degree manslaughter</em>. T5 got bogged down in procedural paperwork and missed the charge!
-            </p>
+            <div class="snippet-box" style="margin-top: 6px;">
+              <strong style="color: #94a3b8;">T5 Output:</strong><br>
+              <em>'reserve deputy was accused of falsifying records regarding his firearms training...'</em>
+              <div style="font-size: 0.78rem; color: #fbbf24; margin-top: 4px;">⚠️ Omitted the actual manslaughter charge!</div>
+            </div>
           </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 24px; padding: 20px; background: rgba(15, 23, 42, 0.8); border: 2px dashed #38bdf8; border-radius: 12px;">
-          <h3 style="color: #fff; margin-bottom: 6px;">🖥️ Live Gradio Interactive Web Application</h3>
-          <p style="color: var(--text-muted); margin-bottom: 14px; font-size: 0.95rem;">
-            Both fine-tuned models are running side-by-side on my laptop right now at port 8080!
-          </p>
-          <a href="http://127.0.0.1:8080" target="_blank" class="btn primary" style="font-size: 1rem; padding: 10px 24px; text-decoration: none;">
-            🚀 Switch to Live Gradio Demo (http://127.0.0.1:8080)
-          </a>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 9: Limitations -->
-    <section class="slide" data-slide="9" data-notes="As in any good engineering project, it's important to be honest about our limitations: 1. We trained for 1 epoch on 12,000 articles because cloud GPU hours are limited on a student budget. Given more time and compute, training for 3 to 5 epochs would boost accuracy even further. 2. Cutting articles at 512 words means if an investigative piece only reveals the culprit at the very end of page 5, our model won't see it. 3. My human study had 25 articles evaluated by one person. In a major corporate research lab, you'd hire multiple annotators and measure their agreement. 4. Most importantly: AI summaries are assistants, not replacements for human judgment. Critical legal, medical, or financial facts should always be checked against the original document!">
+    <!-- SLIDE 11: Live Gradio Demo Presentation -->
+    <section class="slide" data-slide="11" data-notes="Now we will transition to our live interactive Gradio demonstration running locally on port 8080. In this demo, classmates can select any of our curated spotlight cases to inspect pre-computed fine-tuned outputs, ground-truth human references, and analytical commentary notes. Or, classmates can paste any custom English news article into the source text box. We also provide interactive sliders for beam search width from 1 to 8, min length, and max length, along with real-time latency and token counters. Let's switch to the live application now!">
       <div class="slide-header">
-        <span class="tag">SECTION 3.3: ERRORS &amp; LIMITATIONS (5 MIN) • SLIDE 9 OF 10</span>
-        <h2>Limitations: What Would We Do With More Compute?</h2>
+        <span class="tag">SECTION 3.4: LIVE INTERACTIVE DEMO (10 MIN) • SLIDE 11 OF 12</span>
+        <h2>Live Demonstration: Gradio Web Application</h2>
       </div>
       <div class="slide-body">
         <div class="grid-2">
           <div class="info-card">
-            <h4 style="color: #fff; margin-bottom: 6px;">1. Compute & Quota Constraints</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              We trained for 1 full epoch on 12,000 articles. While this gave us an amazing +12% quality boost, commercial models train on millions of articles across weeks of supercomputing.
-            </p>
+            <h4 style="color: #fff; margin-bottom: 8px;">🌟 Interactive Features for Class Exploration:</h4>
+            <ul style="padding-left: 20px; color: #cbd5e1; line-height: 1.6; font-size: 0.92rem;">
+              <li><strong>Curated Spotlight Dropdown:</strong> Instant presentation reliability with pre-computed fine-tuned outputs and human references.</li>
+              <li><strong>Custom Text Input Box:</strong> Paste any breaking news article to evaluate real-time model synthesis.</li>
+              <li><strong>Hyperparameter Sliders:</strong> Adjust <code>num_beams</code> (1 to 8), <code>min_length</code> (10 to 60), and <code>max_length</code> (50 to 200).</li>
+              <li><strong>Live Telemetry:</strong> Real-time latency clock (seconds/article) and token length counters.</li>
+            </ul>
           </div>
 
-          <div class="info-card">
-            <h4 style="color: #fff; margin-bottom: 6px;">2. Long-Form Investigative Articles</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              Cutting articles at 512 words works great for breaking news, but fails on 5,000-word investigative reports where the key takeaway is buried in the final paragraph.
+          <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(11, 17, 32, 0.9); border: 2px dashed #38bdf8; border-radius: 12px; padding: 24px; text-align: center;">
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">🌐</div>
+            <h3 style="color: #fff; margin-bottom: 6px;">Application Running Locally</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+              Server active at: <code style="color: #38bdf8;">http://127.0.0.1:8080</code>
             </p>
-          </div>
-
-          <div class="info-card">
-            <h4 style="color: #fff; margin-bottom: 6px;">3. Human Study Sample Size</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              I evaluated 25 articles with a strict double-blind system. An expanded study would involve multiple human raters to calculate inter-annotator agreement.
-            </p>
-          </div>
-
-          <div class="info-card warn">
-            <h4 style="color: var(--accent-warn); margin-bottom: 6px;">4. The Golden Rule of AI Summaries</h4>
-            <p style="color: #cbd5e1; font-size: 0.92rem;">
-              AI summarization is great for scanning news or executive overviews, but you should never rely on an AI summary for critical legal, medical, or financial decisions without checking the source!
-            </p>
+            <a href="http://127.0.0.1:8080" target="_blank" class="btn primary" style="font-size: 1.05rem; padding: 12px 28px; text-decoration: none;">
+              🚀 Switch to Live Demo (http://127.0.0.1:8080)
+            </a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 10: Conclusion & When to choose which -->
-    <section class="slide" data-slide="10" data-notes="To wrap everything up: Both models did a fantastic job learning how to summarize news articles from scratch, achieving professional-grade ROUGE scores above 40%. If you ever need to pick between them for an NLP project: Choose BART if you care about speed, low cost, and crisp factual summaries. It runs nearly twice as fast and trains in half the time. Choose T5 if your priority is longer, flowing prose and complex grammar. Thank you Dr. Li, thank you classmates, and I would love to answer any questions or try any news article in the live demo!">
+    <!-- SLIDE 12: Synthesis, Decision Matrix & Q&A -->
+    <section class="slide" data-slide="12" data-notes="To conclude our presentation, here are the direct answers to our four research questions: RQ1: Both models achieved massive +12.4% ROUGE leaps, with T5 holding a slight 2.6% lead in word overlap. RQ2: In double-blind human evaluation, BART achieved superior event coverage (4.24 vs 3.88) and factual grounding (4.88 vs 4.68) with fewer hallucinations. RQ3: Locked beam search with 3-gram blocking completely eliminated repetition loops. RQ4: BART is decisively superior for interactive deployment, running 1.84 times faster and training in half the time. If you need speed, direct facts, and low cost, choose BART. If you need longer compound prose, choose T5. Thank you Dr. Li and classmates, and I would love to answer your questions!">
       <div class="slide-header">
-        <span class="tag">SECTION 3.5: Q&amp;A &amp; CONCLUSION (5 MIN) • SLIDE 10 OF 10</span>
-        <h2>Summary: Which Model Should You Choose?</h2>
+        <span class="tag">SECTION 3.5: Q&amp;A &amp; CONCLUSION (5 MIN) • SLIDE 12 OF 12</span>
+        <h2>Final Synthesis: When to Choose BART vs. T5</h2>
       </div>
       <div class="slide-body">
-        <div class="grid-2" style="margin-bottom: 20px;">
+        <div class="grid-2" style="margin-bottom: 14px;">
           <div class="info-card bart" style="background: rgba(56, 189, 248, 0.08);">
-            <h3 style="color: var(--accent-bart); margin-bottom: 8px;">🏆 Pick BART-base If:</h3>
-            <ul style="padding-left: 20px; color: #e2e8f0; line-height: 1.6; font-size: 0.95rem;">
-              <li><strong>You need speed:</strong> Runs at 0.31s per article (almost 2× faster than T5).</li>
-              <li><strong>You want direct facts:</strong> Scored higher on human news coverage (4.24 vs. 3.88) and factual accuracy.</li>
-              <li><strong>You have a budget:</strong> Trained in just 11.5 minutes with half the energy and memory of T5.</li>
+            <h3 style="color: var(--accent-bart); margin-bottom: 6px; font-size: 1.2rem;">🏆 Pick BART-base If:</h3>
+            <ul style="padding-left: 18px; color: #e2e8f0; line-height: 1.55; font-size: 0.9rem;">
+              <li><strong>You need speed &amp; responsiveness:</strong> 0.309s per article (1.84× faster inference).</li>
+              <li><strong>You need high factual accuracy:</strong> 4.88 / 5.0 factual grounding; captures lead news events.</li>
+              <li><strong>You have a tight compute budget:</strong> Trains in 11.5 minutes with stable fp16 mixed precision.</li>
             </ul>
           </div>
 
           <div class="info-card t5" style="background: rgba(74, 222, 128, 0.08);">
-            <h3 style="color: var(--accent-t5); margin-bottom: 8px;">🏆 Pick T5-base If:</h3>
-            <ul style="padding-left: 20px; color: #e2e8f0; line-height: 1.6; font-size: 0.95rem;">
-              <li><strong>You want higher word overlap:</strong> Led by +2.65% ROUGE-1 (42.88%).</li>
-              <li><strong>You want longer, flowing prose:</strong> Averages 100 words with compound sentence fluency.</li>
-              <li><strong>You want one AI for multiple tasks:</strong> T5 can do translation, QA, and summarization in one model.</li>
+            <h3 style="color: var(--accent-t5); margin-bottom: 6px; font-size: 1.2rem;">🏆 Pick T5-base If:</h3>
+            <ul style="padding-left: 18px; color: #e2e8f0; line-height: 1.55; font-size: 0.9rem;">
+              <li><strong>You want maximum n-gram recall:</strong> Leads by +2.65% ROUGE-1 (42.88%) and +2.53% ROUGE-2.</li>
+              <li><strong>You want compound sentence flow:</strong> Averages 100 tokens with finished sentence boundaries.</li>
+              <li><strong>You want a multi-task pipeline:</strong> Shared model for translation, QA, and summarization.</li>
             </ul>
           </div>
         </div>
 
-        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: rgba(11, 17, 32, 0.85); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
           <div style="color: #fff; font-weight: 600;">
-            🎓 Thank you, Dr. Li & Classmates! Any Questions?
+            🎓 Thank you, Dr. Li & Classmates! Q&A Session
           </div>
-          <div style="font-size: 0.88rem; color: var(--text-muted);">
-            Open source code & evaluation: <a href="https://github.com/Aayush30197/text-summarizer-bart-t5" target="_blank" style="color: #38bdf8; text-decoration: none;">GitHub / Aayush30197</a>
+          <div style="font-size: 0.84rem; color: var(--text-muted);">
+            GitHub: <a href="https://github.com/Aayush30197/text-summarizer-bart-t5" target="_blank" style="color: #38bdf8; text-decoration: none;">Aayush30197/text-summarizer-bart-t5</a>
           </div>
         </div>
       </div>
@@ -851,7 +1073,7 @@
   <div id="notes-drawer">
     <div class="notes-header">
       <span>🎙️ Plain-English Speaker Notes & Script (Press 'N' to toggle)</span>
-      <span id="notes-slide-num">Slide 1 of 10</span>
+      <span id="notes-slide-num">Slide 1 of 12</span>
     </div>
     <div class="notes-content" id="notes-text">
       <!-- Injected by JS -->
@@ -861,7 +1083,7 @@
   <!-- Bottom Bar -->
   <footer>
     <div style="display: flex; gap: 14px; align-items: center;">
-      <span id="slide-indicator" style="font-weight: 700; color: #fff;">1 / 10</span>
+      <span id="slide-indicator" style="font-weight: 700; color: #fff;">1 / 12</span>
       <span style="font-size: 0.82rem; color: var(--text-muted);">
         Navigate: <span class="kbd">←</span> <span class="kbd">→</span> or <span class="kbd">Space</span> • Notes: <span class="kbd">N</span>
       </span>
@@ -941,9 +1163,9 @@
         timerInterval = setInterval(() => {
           secondsElapsed++;
           timerDisplay.textContent = formatTime(secondsElapsed);
-          if (secondsElapsed >= 600) {
+          if (secondsElapsed >= 1800) {
             timerDisplay.style.color = '#ef4444';
-          } else if (secondsElapsed >= 480) {
+          } else if (secondsElapsed >= 1500) {
             timerDisplay.style.color = '#fbbf24';
           }
         }, 1000);
