@@ -206,14 +206,17 @@ def main():
     )
 
     # ---- Trainer ----
-    trainer = Seq2SeqTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=tokenized["train"],
-        eval_dataset=tokenized["validation"],
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-    )
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": tokenized["train"],
+        "eval_dataset": tokenized["validation"],
+        "data_collator": data_collator,
+    }
+    try:
+        trainer = Seq2SeqTrainer(**trainer_kwargs, processing_class=tokenizer)
+    except TypeError:
+        trainer = Seq2SeqTrainer(**trainer_kwargs, tokenizer=tokenizer)
 
     # ---- Train ----
     resume_checkpoint = None
