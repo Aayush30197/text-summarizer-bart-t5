@@ -37,7 +37,7 @@ Do not assume either model wins in advance.
 | Models | `facebook/bart-base` (~140M) and `t5-base` (~220M) by default, to be confirmed by the Oct 29 smoke test (closer in size than t5-small, so a fairer comparison). Fall back to `t5-small` (~60M) if t5-base is too slow or runs out of memory in fp32; if so, the report must state the size mismatch. The T5 checkpoint is a config option. |
 | Max source length | 512 tokens, both models (documented deviation from the proposal's 1,024 due to compute) |
 | Max target length | 128 tokens, both models |
-| Training data | Fixed random subset of 10k-15k articles (final size set after the smoke test), 1 epoch |
+| Training data | Fixed random subset of 12,000 articles, updated to 3 epochs (1,125 total steps) |
 | Validation data | Fixed subset of 1,000 articles |
 | Test data | Fixed subset of 1,000 articles (500 if generation is too slow) |
 | Subset handling | Save indices to `data/indices_{train,val,test}.json`; subsets never change; no overlap between train and val/test |

@@ -21,10 +21,10 @@ max_target_length: 128
 per_device_train_batch_size: 4
 per_device_eval_batch_size: 4
 gradient_accumulation_steps: 8  # effective batch size = 4 * 8 = 32
-num_train_epochs: 1
+num_train_epochs: 3
 weight_decay: 0.01
 lr_scheduler_type: "linear"
-warmup_steps: 37  # ~10% of ~375 total steps
+warmup_steps: 112  # ~10% of ~1,125 total steps (3 epochs * 375 steps)
 logging_steps: 10
 eval_steps: 100
 save_steps: 100
