@@ -471,6 +471,47 @@
       font-size: 0.72rem;
       color: var(--indie-gold);
     }
+
+    /* Print / PDF Export Styling for Submissions */
+    @media print {
+      @page {
+        size: 16in 9in landscape;
+        margin: 0;
+      }
+
+      body {
+        background: #0c1017 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        overflow: visible !important;
+      }
+
+      header, footer, #notes-drawer, .timer-container, .btn, .btn-gradio {
+        display: none !important;
+      }
+
+      #deck {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .slide {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        width: 16in !important;
+        height: 9in !important;
+        max-width: 16in !important;
+        padding: 0.6in 0.8in !important;
+        box-sizing: border-box !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: #0c1017 !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -486,7 +527,13 @@
       </span>
     </div>
 
-    <div style="display: flex; gap: 14px; align-items: center;">
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button class="btn" onclick="window.print()" title="Print or Save all 15 slides as a 16:9 PDF deck" style="background: rgba(56, 189, 248, 0.15); border-color: #38bdf8; color: #38bdf8; font-weight: 700;">
+        🖨️ Export PDF Slides
+      </button>
+      <a href="comparative_summarization_defense.pptx" download="comparative_summarization_defense.pptx" class="btn" title="Download Canva / PowerPoint .pptx presentation" style="background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #f59e0b; font-weight: 700;">
+        📥 Canva / PPTX
+      </a>
       <div class="timer-container">
         <span>⏱️</span>
         <span class="timer-display" id="timer">00:00</span>
@@ -503,11 +550,11 @@
   <main id="deck">
 
     <!-- SLIDE 1: ACT I — What is Abstractive Summarization? -->
-    <section class="slide active" data-slide="1" data-notes="Good morning Dr. Li and classmates! Today, I’m presenting my capstone project on a problem that impacts all of us: Can we teach computers to read long, complicated news stories and write accurate summaries in their own words?
+    <section class="slide active" data-slide="1" data-notes="Good morning Dr. Li and classmates! Today, I’m presenting my capstone project on a fundamental NLP challenge: Can a machine read long, complicated news stories and write accurate summaries in its own words?
 In Natural Language Processing, there are two distinct ways a computer can summarize:
 - The old way is called Extractive Summarization. Think of this like taking a yellow highlighter to a textbook: the computer can only copy and paste full sentences that were already written. It's safe, but it sounds choppy and robotic.
-- What we are building today is called Abstractive Summarization. Think of this like a student reading an entire chapter and writing their own study notes. The AI has to understand what happened, synthesize the core facts, and generate brand-new sentences from scratch.
-Our goal was to take 1,000-word breaking news articles from CNN and generate concise, accurate 3-sentence summaries in under a second using two leading language models: BART and T5.">
+- What I investigated is called Abstractive Summarization. Think of this like a student reading an entire chapter and writing their own study notes. The AI has to understand what happened, synthesize the core facts, and generate brand-new sentences from scratch.
+My goal was to take 1,000-word breaking news articles from CNN and generate concise, accurate 3-sentence summaries in under a second using two leading language models: BART and T5.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT I // SCENE 01: THE FOUNDATIONS</span>
@@ -538,7 +585,7 @@ Our goal was to take 1,000-word breaking news articles from CNN and generate con
           <!-- Abstractive Card -->
           <div class="film-card bart">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="color: var(--indie-cyan); font-size: 1.15rem;">✍️ Abstractive Summarization (Our Project)</h3>
+              <h3 style="color: var(--indie-cyan); font-size: 1.15rem;">✍️ Abstractive Summarization (My Project)</h3>
               <span class="badge bart">Student Study Notes</span>
             </div>
             <div class="notebook-analogy">
@@ -568,7 +615,7 @@ Our goal was to take 1,000-word breaking news articles from CNN and generate con
 1. Hallucinations: The AI can confidently invent facts out of thin air—like naming a stadium that was never in the story.
 2. Missing the main point: The AI might get distracted describing background paperwork and forget to mention whether the defendant was found guilty.
 3. Repetition loops: Without mathematical penalties, the model can get stuck repeating the same phrase over and over.
-To test how different AI designs handle these challenges, we selected two distinct transformer models: BART and T5.">
+To test how different AI designs handle these challenges, I selected two distinct transformer models: BART and T5.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT I // SCENE 02: THE VULNERABILITIES</span>
@@ -622,7 +669,7 @@ To test how different AI designs handle these challenges, we selected two distin
     </section>
 
     <!-- SLIDE 3: ACT II — Meet the Contenders: BART vs. T5 -->
-    <section class="slide" data-slide="3" data-notes="To test how different AI designs handle these challenges, we selected two distinct transformer models:
+    <section class="slide" data-slide="3" data-notes="To test how different AI designs handle these challenges, I selected two distinct transformer models:
 - BART (built by Meta): Think of BART as a 'Sentence Repairman'. It was pre-trained by taking clean text, erasing random words, scrambling sentences, and learning to piece the original article back together. This makes it naturally skilled at editing and condensing.
 - T5 (built by Google): Think of T5 as a 'Universal Text Converter'. Google trained it to do every NLP task using plain English prompts. To make T5 summarize, you literally feed it the instruction: summarize: followed by the text.
 Both use the Transformer architecture with self-attention—connecting words across long distances, like knowing that 'he' refers to 'the boy' in 'The boy dropped the glass because he was careless.'">
@@ -686,11 +733,11 @@ Both use the Transformer architecture with self-attention—connecting words acr
     <!-- SLIDE 4: ACT II (Cont.) — Architectural Specs & The Baseline Advantage -->
     <section class="slide" data-slide="4" data-notes="Here are the technical specifications of both models.
 Notice the size difference: T5-base has 220 million parameters—about 57% larger than BART-base's 140 million! It has twice as many encoder and decoder layers (12 versus 6).
-Now, here is one of the most important concepts of our presentation:
+Now, here is one of the most important concepts of my presentation:
 Before fine-tuning, T5 scored 30.43% on ROUGE-1 compared to BART's 27.87%.
 Why did T5 have this initial head start?
 Because Google's pre-training for T5 included multi-task supervised NLP datasets, which already had news summarization tasks! BART had only seen general corrupted text.
-T5 started with an advantage, but the real test is how both models adapt after we train them on the exact same 12,000 articles.">
+T5 started with an advantage, but the real test is how both models adapt after I train them on the exact same 12,000 articles.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT II // SCENE 02: THE HARDWARE BLUEPRINT</span>
@@ -754,9 +801,9 @@ T5 started with an advantage, but the real test is how both models adapt after w
 
     <!-- SLIDE 5: ACT III — Training on 12k News Articles & Data Hygiene -->
     <section class="slide" data-slide="5" data-notes="To ensure a completely fair comparison, I trained both models under identical conditions:
-- We used the famous CNN/DailyMail dataset, consisting of real news articles paired with bullet-point summaries written by human journalists.
-- We sampled 12,000 training articles and 1,000 test articles using a locked random seed so there was zero cheating or data leakage.
-- We capped input articles at 512 words. In journalism, there's a well-known concept called the 'inverted pyramid': reporters put the most critical who, what, when, and where right at the top. So reading the first 512 words captures over 90% of the core facts while saving massive computing time.">
+- I used the famous CNN/DailyMail dataset, consisting of real news articles paired with bullet-point summaries written by human journalists.
+- I sampled 12,000 training articles and 1,000 test articles using a locked random seed so there was zero cheating or data leakage.
+- I capped input articles at 512 words. In journalism, there's a well-known concept called the 'inverted pyramid': reporters put the most critical who, what, when, and where right at the top. So reading the first 512 words captures over 90% of the core facts while saving massive computing time.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT III // SCENE 01: THE EXPERIMENTAL DESIGN</span>
@@ -834,8 +881,8 @@ T5 started with an advantage, but the real test is how both models adapt after w
     <!-- SLIDE 6: ACT III (Cont.) — Decoding: Greedy vs. Beam Search -->
     <section class="slide" data-slide="6" data-notes="How does the AI actually choose which words to write? This is called Decoding.
 Greedy Search is the simplest approach: at every single step, it chooses the word with the highest probability. If 'The' has 60% probability, it picks 'The'. It is fast, but short-sighted and frequently gets stuck in loops.
-Beam Search, which we used with 4 beams, acts like a master chess player: it explores 4 promising paths at the same time, expanding and comparing sentences before picking the best overall summary.
-To eliminate repetitive stuttering, we added no_repeat_ngram_size = 3. This mathematically bans the model from repeating any 3-word phrase. Across all 1,000 test articles, this achieved an exact 0.0% repetition loop rate!">
+Beam Search, which I locked with 4 beams, acts like a master chess player: it explores 4 promising paths at the same time, expanding and comparing sentences before picking the best overall summary.
+To eliminate repetitive stuttering, I added no_repeat_ngram_size = 3. This mathematically bans the model from repeating any 3-word phrase. Across all 1,000 test articles, this achieved an exact 0.0% repetition loop rate!">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT III // SCENE 02: THE GENERATION MECHANICS</span>
@@ -857,7 +904,7 @@ To eliminate repetitive stuttering, we added no_repeat_ngram_size = 3. This math
           </div>
 
           <div class="film-card bart">
-            <h3 style="color: var(--indie-cyan); font-size: 1.05rem;">🔭 Beam Search (num_beams = 4 — OUR CHOICE)</h3>
+            <h3 style="color: var(--indie-cyan); font-size: 1.05rem;">🔭 Beam Search (num_beams = 4 — MY CHOICE)</h3>
             <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 4px;">
               Maintains 4 candidate sentences in parallel, pruning weak paths at every step.
             </p>
@@ -903,7 +950,7 @@ To eliminate repetitive stuttering, we added no_repeat_ngram_size = 3. This math
     </section>
 
     <!-- SLIDE 7: ACT IV — Grading the AI: What is ROUGE? & The Fatal Trap -->
-    <section class="slide" data-slide="7" data-notes="Now, how do computer scientists grade an AI summary? We use a metric called ROUGE.
+    <section class="slide" data-slide="7" data-notes="Now, how does an evaluator grade an AI summary in NLP? Researchers use a metric called ROUGE.
 Don't let the acronym intimidate you—ROUGE is simply a word-matching game against a human journalist:
 - ROUGE-1 counts how many individual words match.
 - ROUGE-2 counts how many 2-word phrases like 'White House' match.
@@ -912,7 +959,7 @@ In news summarization, a ROUGE score around 40% is considered a strong, human-gr
 However, look at the bottom of this slide: ROUGE has a fatal blindspot!
 If the human writes: 'The senator voted NO on the tax bill' and the AI writes: 'The senator voted YES on the tax bill'...
 6 out of 7 words match! ROUGE gives it an 85.7% score!
-Yet the summary is 100% false! This is why automated metrics alone are dangerous, and why we conducted human evaluation.">
+Yet the summary is 100% false! This is why automated metrics alone are dangerous, and why I conducted a blind human evaluation.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT IV // SCENE 01: THE EVALUATION SYSTEM</span>
@@ -970,11 +1017,11 @@ Yet the summary is 100% false! This is why automated metrics alone are dangerous
 
     <!-- SLIDE 8: ACT IV (Cont.) — Quantitative Results: Who Won the Numbers Game? -->
     <section class="slide" data-slide="8" data-notes="Here are the empirical results across 1,000 brand-new, unseen news articles:
-First, training was a massive success: both models leaped by +12.4 percentage points in ROUGE-1 after learning on our 12,000 articles.
+First, training was a massive success: both models leaped by +12.4 percentage points in ROUGE-1 after learning on the 12,000 articles.
 If you look strictly at the ROUGE leaderboard, T5 won the numbers game: it reached 42.88% ROUGE-1 compared to BART's 40.23%, and 20.24% on ROUGE-2.
 However, look at ROUGE-Lsum: BART beat T5 with 37.01% versus 36.67%!
 This proves that BART structures sentence boundaries better for multi-sentence news summaries.
-Furthermore, in our 3-epoch cloud scaling study on Google Colab, BART climbed further to 40.86% ROUGE-1 and 37.95% ROUGE-Lsum, proving steady scaling gains with ultra-fast 0.296s latency.">
+Furthermore, in my 3-epoch cloud scaling study on Google Colab, BART climbed further to 40.86% ROUGE-1 and 37.95% ROUGE-Lsum, proving steady scaling gains with ultra-fast 0.296s latency.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT IV // SCENE 02: THE SCOREBOARD</span>
@@ -1159,14 +1206,14 @@ If you're building a live website or mobile app where a user is waiting for an i
 
     <!-- SLIDE 10: ACT V — Engineering Behind the Curtain: Three Critical Bugs -->
     <section class="slide" data-slide="10" data-notes="Dr. Li always emphasizes engineering challenges and debugging. In real-world machine learning, models rarely train smoothly on the first try.
-We had to solve three critical bugs:
-Bug 1: T5 fp16 NaN Loss. When we launched T5 with fp16 mixed precision on the T4 GPU, the training loss suddenly crashed to NaN at step 42. T5 uses RMSNorm without additive bias, which caused mathematical overflow past 65,504. We solved it by switching T5 to fp32 full precision.
+I had to solve three critical bugs:
+Bug 1: T5 fp16 NaN Loss. When I launched T5 with fp16 mixed precision on the T4 GPU, the training loss suddenly crashed to NaN at step 42. T5 uses RMSNorm without additive bias, which caused mathematical overflow past 65,504. I solved it by switching T5 to fp32 full precision.
 Bug 2: CUDA Out-Of-Memory. Articles over 1,500 words crashed PyTorch because quadratic self-attention blew past memory limits. Capping at 512 tokens solved it.
 Bug 3: Repetition Loops. Early models repeated phrases like 'in the city in the city'. Adding 3-gram blocking to beam search killed repetition loops completely.">
       <div class="slide-header">
         <div>
           <span class="scene-tag">ACT V // SCENE 01: BEHIND THE CURTAIN</span>
-          <h2>Engineering Challenges &amp; The Three Bugs We Solved</h2>
+          <h2>Engineering Challenges &amp; The Three Bugs I Solved</h2>
         </div>
         <div class="act-indicator">Debugging Transformers on Real Hardware</div>
       </div>
@@ -1222,14 +1269,14 @@ Bug 3: Repetition Loops. Early models repeated phrases like 'in the city in the 
     </section>
 
     <!-- SLIDE 11: ACT V (Cont.) — Why Numbers Lie: Double-Blind Human Study -->
-    <section class="slide" data-slide="11" data-notes="Our demo proves a famous saying in NLP: High ROUGE scores do not guarantee true facts. An AI can copy long phrases to get high ROUGE points, but still get the facts completely backward.
+    <section class="slide" data-slide="11" data-notes="My demo proves a famous saying in NLP: High ROUGE scores do not guarantee true facts. An AI can copy long phrases to get high ROUGE points, but still get the facts completely backward.
 To test this scientifically, I conducted a double-blind human evaluation on 25 randomized articles. I anonymized the summaries into 'Summary A' and 'Summary B' with model names locked in a key file so I couldn't be biased.
 I graded each summary from 1 to 5 stars on four questions:
 1. Coverage: Did it capture the main news story?
 2. Factuality: Were the facts strictly true to the article?
 3. Fluency: Did it read naturally?
 4. Conciseness: Was it free of fluff?
-When we unlocked the key, the surprise was that BART actually beat T5 in factual accuracy (4.88 vs. 4.68) and main story coverage (4.24 vs. 3.88).
+When I unlocked the key, the surprise was that BART actually beat T5 in factual accuracy (4.88 vs. 4.68) and main story coverage (4.24 vs. 3.88).
 T5 had 3 factual hallucinations, while BART only had 1. The dominant error for both models was not hallucination, but omission—simply running out of space under the 128-word limit.">
       <div class="slide-header">
         <div>
@@ -1331,7 +1378,7 @@ T5 had 3 factual hallucinations, while BART only had 1. The dominant error for b
     </section>
 
     <!-- SLIDE 12: ACT V (Cont.) — The Anatomy of AI Mistakes: 3 Spotlight Stories -->
-    <section class="slide" data-slide="12" data-notes="Now let's examine the three spotlight stories from our live demo that demonstrate these AI mistakes in real life:
+    <section class="slide" data-slide="12" data-notes="Now let's examine the three spotlight stories from my live demo that demonstrate these AI mistakes in real life:
 In Spotlight 1 (Cape Town Airport): Look at what BART wrote: It starts with 'Virginia teen accused of being ISIS recruiter'—but this article took place in South Africa! BART suffered from an extrinsic hallucination by retrieving a memory from pre-training. T5 stayed completely faithful.
 In Spotlight 2 (Premier League Soccer): The tables turn! Crystal Palace hosted Manchester City. T5 hallucinated that the match was played at 'the Emirates'—which is Arsenal's stadium! BART got the venue and the manager's quotes 100% right.
 In Spotlight 3 (Police Shooting): Notice event coverage. BART captures the critical headline that the 73-year-old reserve deputy was charged with second-degree manslaughter. T5 got lost describing background training paperwork and omitted the manslaughter charge completely!">
@@ -1340,7 +1387,7 @@ In Spotlight 3 (Police Shooting): Notice event coverage. BART captures the criti
           <span class="scene-tag">ACT V // SCENE 03: CASE STUDIES</span>
           <h2>The Anatomy of AI Mistakes: 3 Real Stories</h2>
         </div>
-        <div class="act-indicator">Qualitative Spotlight from our Live Gradio App</div>
+        <div class="act-indicator">Qualitative Spotlight from my Live Gradio App</div>
       </div>
       <div class="slide-body">
         <div class="grid-3">
@@ -1399,7 +1446,7 @@ In Spotlight 3 (Police Shooting): Notice event coverage. BART captures the criti
         <div class="director-callout" style="margin-top: 12px;">
           <span>🎬</span>
           <div>
-            <strong>Interactive Proof:</strong> All three stories can be tested live side-by-side right now in our Gradio web application by clicking the button in the top right header!
+            <strong>Interactive Proof:</strong> All three stories can be tested live side-by-side right now in my Gradio web application by clicking the button in the top right header!
           </div>
         </div>
       </div>
@@ -1413,7 +1460,7 @@ Question 2: Why did T5 produce NaN loss in fp16?
 Answer: T5 uses RMSNorm without additive bias, overflowing past 65,504 in float16. Switching to fp32 fixed it.
 Question 3: Why did you limit to 512 tokens?
 Answer: Self-attention scales quadratically O(N squared). 512 tokens captures the Inverted Pyramid's 5 Ws while preventing GPU memory crashes.
-And if Dr. Li asks something outside our test: I will say: 'That is a great question, Dr. Li. We evaluated on the 1,000-article test set under our fixed decoding config. We did not test that specific condition, but based on transformer theory, my hypothesis would be... That would be an exciting experiment for future work.'">
+And if Dr. Li asks something outside my test: I will say: 'That is a great question, Dr. Li. In my experiment, I evaluated on the 1,000-article test set under my fixed decoding config. I did not test that specific condition, but based on transformer theory, my hypothesis would be... That would be an exciting direction for future work.'">
       <div class="slide-header">
         <div>
           <span class="scene-tag">FINALE // SCENE 01: THE DEFENSE</span>
@@ -1447,7 +1494,7 @@ And if Dr. Li asks something outside our test: I will say: 'That is a great ques
           <div class="film-card bart">
             <h4 style="color: var(--indie-cyan); font-size: 0.88rem;">Bonus: What if you are asked something you don't know?</h4>
             <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px; line-height: 1.45;">
-              <strong>What to say:</strong> <em>"That is a great question, Dr. Li. In our experiment, we evaluated on the 1,000-article test set under our fixed decoding config. We did not test that specific condition, but based on transformer theory, my hypothesis would be [...]. That would be an exciting direction for future work."</em>
+              <strong>What to say:</strong> <em>"That is a great question, Dr. Li. In my experiment, I evaluated on the 1,000-article test set under my fixed decoding config. I did not test that specific condition, but based on transformer theory, my hypothesis would be [...]. That would be an exciting direction for future work."</em>
             </p>
           </div>
         </div>
@@ -1462,11 +1509,11 @@ And if Dr. Li asks something outside our test: I will say: 'That is a great ques
     </section>
 
     <!-- SLIDE 14: FINALE (Cont.) — When to Deploy Which Model & The Five Golden Rules -->
-    <section class="slide" data-slide="14" data-notes="Every good research project has limitations: We trained for 1 epoch on 12,000 articles due to free cloud GPU quotas; long-form investigative pieces get truncated past 512 words; and our human study evaluated 25 articles with a single evaluator.
+    <section class="slide" data-slide="14" data-notes="Every good research project has limitations: I trained for 1 epoch on 12,000 articles due to free cloud GPU quotas; long-form investigative pieces get truncated past 512 words; and my human study evaluated 25 articles with a single evaluator.
 So, which model should you choose if you are building an NLP product?
 - Pick BART if you care about speed, lower cloud bills, and direct factual accuracy. It runs twice as fast, cuts straight to the headline, and trains in half the time.
 - Pick T5 if your priority is longer, grammatically complex prose or if you want a single model that can handle translation and question-answering alongside summarization.
-Thank you Dr. Li, thank you classmates, and I'd be happy to take any questions or run custom articles through our demo!">
+Thank you Dr. Li, thank you classmates, and I'd be happy to take any questions or run custom articles through my demo!">
       <div class="slide-header">
         <div>
           <span class="scene-tag">FINALE // SCENE 02: THE VERDICT</span>
@@ -1521,7 +1568,7 @@ Thank you Dr. Li, thank you classmates, and I'd be happy to take any questions o
     </section>
 
     <!-- SLIDE 15: QUICK REVISION — The Memory Vault -->
-    <section class="slide" data-slide="15" data-notes="This final slide is your quick memory vault. Every single number from our project is summarized here in one place:
+    <section class="slide" data-slide="15" data-notes="This final slide is your quick memory vault. Every single number from my capstone project is summarized here in one place:
 - BART: 140 million parameters, fp16, 6 layers, 11m 30s training, 0.309s latency, 40.23% R-1, 37.01% R-Lsum, 4.88 factuality.
 - BART 3-Epoch (Colab): 40.86% R-1, 18.44% R-2, 37.95% R-Lsum, 0.296s latency.
 - T5: 220 million parameters (+57%), fp32, 12 layers, 21m 52s training, 0.569s latency, 42.88% R-1, 36.67% R-Lsum, 4.68 factuality.
